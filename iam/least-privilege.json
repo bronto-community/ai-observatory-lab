@@ -1,0 +1,33 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "RunTheLabLocally",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream",
+        "bedrock:Converse",
+        "bedrock:ConverseStream"
+      ],
+      "Resource": [
+        "arn:aws:bedrock:*::foundation-model/anthropic.claude-haiku-4-5*",
+        "arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-4-5*",
+        "arn:aws:bedrock:*::foundation-model/amazon.nova-*",
+        "arn:aws:bedrock:*:*:inference-profile/us.anthropic.claude-haiku-4-5*",
+        "arn:aws:bedrock:*:*:inference-profile/us.anthropic.claude-sonnet-4-5*",
+        "arn:aws:bedrock:*:*:inference-profile/us.amazon.nova-*",
+        "arn:aws:bedrock:*:*:inference-profile/eu.anthropic.claude-haiku-4-5*",
+        "arn:aws:bedrock:*:*:inference-profile/eu.anthropic.claude-sonnet-4-5*",
+        "arn:aws:bedrock:*:*:inference-profile/eu.amazon.nova-*",
+        "arn:aws:bedrock:*:*:inference-profile/global.*"
+      ]
+    },
+    {
+      "Sid": "DoctorIdentityCheck",
+      "Effect": "Allow",
+      "Action": "sts:GetCallerIdentity",
+      "Resource": "*"
+    }
+  ]
+}

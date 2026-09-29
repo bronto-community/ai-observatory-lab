@@ -1,0 +1,6 @@
+strands-agents>=1.10
+bedrock-agentcore>=0.1.7
+boto3>=1.40
+opentelemetry-sdk>=1.37
+opentelemetry-exporter-otlp-proto-http>=1.37
+opentelemetry-instrumentation-botocore>=0.58b0

@@ -1,0 +1,14 @@
+# secrets and per-org state
+.env
+dashboard/state.json
+workshop/
+bug-report/
+facilitator.md
+.claude/
+# build output
+node_modules/
+dist/
+.vercel-deploy/
+.vercel
+__pycache__/
+.DS_Store

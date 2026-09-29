@@ -21,6 +21,17 @@ for tonight's Bronto org. It can only send data in; it can't read anything,
 and it's revoked after the event. Using your own Bronto account instead? See
 [Your own Bronto account](#your-own-bronto-account).
 
+### Bronto logins for the workshop
+
+To see your traces and the shared dashboard in the Bronto UI
+([app.eu.bronto.io](https://app.eu.bronto.io)), take one login from the
+**[workshop logins sheet](https://docs.google.com/spreadsheets/d/1Sm2dHSTxR1fxd8qEGiPps5un6NEB-zUll9A8nIESieY/edit?gid=1415086455#gid=1415086455)**.
+Use the row you're given (or the next free one), so nobody shares a login.
+The accounts are read-only and are removed after the event.
+
+In Bronto, filter traces on `attendee = yourname` (the `ATTENDEE` value in
+your `.env`) to find your own. The dashboard is **LLM KPIs — Storefront Assistant**.
+
 ### macOS and Linux (bash, zsh), and Windows under WSL
 
 1. **Credentials.** On the workshop page choose **Get AWS CLI credentials**,

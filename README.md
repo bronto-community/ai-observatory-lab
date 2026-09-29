@@ -16,6 +16,11 @@ You need Docker and AWS credentials that can call Bedrock. Pick your shell:
 
 Everything else (the image, the steps, what you see in Bronto) is identical.
 
+The `.env` examples below already contain the **shared workshop ingestion key**
+for tonight's Bronto org. It can only send data in; it can't read anything,
+and it's revoked after the event. Using your own Bronto account instead? See
+[Your own Bronto account](#your-own-bronto-account).
+
 ### macOS and Linux (bash, zsh), and Windows under WSL
 
 1. **Credentials.** On the workshop page choose **Get AWS CLI credentials**,
@@ -31,7 +36,7 @@ Everything else (the image, the steps, what you see in Bronto) is identical.
    AWS_SECRET_ACCESS_KEY
    AWS_SESSION_TOKEN
    AWS_REGION=us-west-2
-   OTEL_EXPORTER_OTLP_HEADERS=x-bronto-api-key=YOUR-BRONTO-INGESTION-KEY
+   OTEL_EXPORTER_OTLP_HEADERS=x-bronto-api-key=03a34d3a-975f-4341-9f9e-95cd0a4161bc.-o4bnm_fb2iX7EiBSLoMHibQ0eU0AhTZWeosgQ5RulY=
    ATTENDEE=yourname
    EOF
    ```
@@ -83,7 +88,7 @@ Docker Desktop must be running.
    AWS_SECRET_ACCESS_KEY
    AWS_SESSION_TOKEN
    AWS_REGION=us-west-2
-   OTEL_EXPORTER_OTLP_HEADERS=x-bronto-api-key=YOUR-BRONTO-INGESTION-KEY
+   OTEL_EXPORTER_OTLP_HEADERS=x-bronto-api-key=03a34d3a-975f-4341-9f9e-95cd0a4161bc.-o4bnm_fb2iX7EiBSLoMHibQ0eU0AhTZWeosgQ5RulY=
    ATTENDEE=yourname
    "@ | Set-Content -Encoding ascii .env
    ```

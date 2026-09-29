@@ -43,19 +43,37 @@ and it's revoked after the event. Using your own Bronto account instead? See
 
    The bare `AWS_…` lines pass the credentials you exported into the container.
 
-3. **Check, run, ask** (ask from a second terminal):
+> **Run the commands below one box at a time, in order.** Don't paste
+> several boxes together: step 4 starts the agent and keeps running, so
+> anything pasted after it never runs.
+
+3. **Check your setup.** Paste this, press Enter, and wait for three `ok` lines:
 
    ```bash
    docker run --rm --env-file .env ghcr.io/bronto-community/track-a-agent python doctor.py
+   ```
+
+4. **Start the agent.** Paste this in the **same terminal**. It keeps running
+   and prints a line per request: **leave it running**. Ctrl-C stops it.
+
+   ```bash
    docker run --rm -p 8080:8080 --env-file .env -e AGENT_STEP=1 ghcr.io/bronto-community/track-a-agent
+   ```
+
+5. **Ask it something.** Open a **second terminal** (a new tab or window) and paste:
+
+   ```bash
    curl -s localhost:8080/invocations -d '{"prompt": "Where is order 1042?"}'
    ```
 
-   Switch model for one request:
+   Same question with a different model (also in the second terminal):
 
    ```bash
    curl -s localhost:8080/invocations -d '{"prompt": "Where is order 1042?", "model": "us.amazon.nova-lite-v1:0"}'
    ```
+
+   To move to the next step, go back to the first terminal, press **Ctrl-C**,
+   and run step 4 again with `AGENT_STEP=2` (then `3`).
 
 **Linux notes**
 - If you run `sudo docker`, sudo drops your exported credentials and the
@@ -96,19 +114,35 @@ Docker Desktop must be running.
    Keep `-Encoding ascii`. Without it Windows PowerShell 5.1 can write a
    byte-order mark, and Docker then misreads the first line.
 
-3. **Check, run, ask** (ask from a second PowerShell window):
+> **Run the commands below one box at a time, in order.** Step 4 starts the
+> agent and keeps running, so anything pasted after it never runs.
+
+3. **Check your setup.** Paste this, press Enter, and wait for three `ok` lines:
 
    ```powershell
    docker run --rm --env-file .env ghcr.io/bronto-community/track-a-agent python doctor.py
+   ```
+
+4. **Start the agent.** Same PowerShell window. It keeps running: **leave it
+   running**. Ctrl-C stops it.
+
+   ```powershell
    docker run --rm -p 8080:8080 --env-file .env -e AGENT_STEP=1 ghcr.io/bronto-community/track-a-agent
+   ```
+
+5. **Ask it something.** Open a **second PowerShell window** and paste:
+
+   ```powershell
    Invoke-RestMethod localhost:8080/invocations -Method Post -ContentType application/json -Body (@{prompt = "Where is order 1042?"} | ConvertTo-Json)
    ```
 
-   Switch model for one request:
+   Same question with a different model (also in the second window):
 
    ```powershell
    Invoke-RestMethod localhost:8080/invocations -Method Post -ContentType application/json -Body (@{prompt = "Where is order 1042?"; model = "us.amazon.nova-lite-v1:0"} | ConvertTo-Json)
    ```
+
+   Next step: first window, **Ctrl-C**, then run step 4 again with `AGENT_STEP=2` (then `3`).
 
 **Why not `curl` on Windows?** In Windows PowerShell 5.1, `curl` is an alias
 for `Invoke-WebRequest`, and the real `curl.exe` mangles the JSON quotes

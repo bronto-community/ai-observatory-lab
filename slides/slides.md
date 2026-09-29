@@ -376,7 +376,7 @@ layout: center
 
 From the workshop page: **Get AWS CLI credentials** → copy the `export AWS_…` block → paste. Check with <code>aws sts get-caller-identity</code> if you have the CLI.
 
-<div class="n">4 · Check everything</div>
+<div class="n">4 · Check everything (run on its own, wait for it)</div>
 
 <Cmd run="docker run --rm --env-file .env ghcr.io/bronto-community/track-a-agent python doctor.py" />
 
@@ -387,7 +387,7 @@ From the workshop page: **Get AWS CLI credentials** → copy the `export AWS_…
 </div>
 <div>
 
-<div class="n">3 · Make a folder and a <code>.env</code> file</div>
+<div class="n">3 · Make a folder and a <code>.env</code> file (one paste)</div>
 
 <Cmd run="mkdir track-a && cd track-a
 cat > .env <<'EOF'
@@ -445,6 +445,8 @@ AWS account". Nova Lite needs no model-access form.
 <div class="n">Start it</div>
 
 <Cmd run="docker run --rm -p 8080:8080 --env-file .env -e AGENT_STEP=1 ghcr.io/bronto-community/track-a-agent" />
+
+<div class="keep">Keeps running: <b>leave it</b>. Ask from a <b>second terminal</b>.</div>
 
 <div class="n">Ask it something, from a second terminal</div>
 
@@ -512,6 +514,8 @@ Remember that number.
 <div class="n">Restart with step 2 (Ctrl-C first)</div>
 
 <Cmd run="docker run --rm -p 8080:8080 --env-file .env -e AGENT_STEP=2 ghcr.io/bronto-community/track-a-agent" />
+
+<div class="keep">Keeps running: <b>leave it</b>. Ask from a <b>second terminal</b>.</div>
 
 <div class="n">Same question</div>
 
@@ -582,6 +586,8 @@ says the customer got a bad answer.
 
 <Cmd run="docker run --rm -p 8080:8080 --env-file .env -e AGENT_STEP=3 ghcr.io/bronto-community/track-a-agent" />
 
+<div class="keep">Keeps running: <b>leave it</b>. Ask from a <b>second terminal</b>.</div>
+
 <div class="n">Ask with Claude Haiku 4.5 (the default)</div>
 
 <Ask prompt="Do you have espresso cups? If not, what would you suggest instead?" />
@@ -596,7 +602,6 @@ says the customer got a bad answer.
 <tr><td>Haiku 4.5</td><td>3,630 / 416</td><td>6.7 s</td><td>$0.0057</td></tr>
 <tr><td>Nova Lite</td><td>2,480 / 317</td><td>5.1 s</td><td>$0.0002</td></tr>
 </table>
-<span>My rehearsal runs. Yours will differ: that's the point.</span>
 </div>
 
 </div>
@@ -627,6 +632,8 @@ says the customer got a bad answer.
 Step 3 adds product_researcher: a second Strands agent with its own prompt and
 one tool, wrapped as a tool of the first agent. In the trace it shows up as
 execute_tool product_researcher, with a whole invoke_agent nested inside.
+
+The table is from my rehearsal runs. Theirs will differ: that's the point.
 
 Ask them to compare the two answers, not just the numbers. In my run Nova
 Lite skipped the sub-agent, hit the flaky tool, and leaked a <thinking> block

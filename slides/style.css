@@ -117,3 +117,7 @@ kbd {
 .slidev-layout pre, .slidev-layout pre code, .slidev-layout .line {
   white-space: pre-wrap; overflow-wrap: anywhere;
 }
+
+/* "leave this running" hint under a long-running docker command */
+.keep { font-size: 0.72rem; color: var(--ink-dim); margin: 0.25rem 0 0.1rem; }
+.keep b { color: var(--claim); }

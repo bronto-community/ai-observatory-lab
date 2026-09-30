@@ -1,0 +1,18 @@
+export const metadata = { title: "Clean up" };
+
+# Clean up
+
+Nothing in the labs keeps running on its own, and the AWS Free plan can't charge you. Still, tidy up:
+
+1. **Stop the agents.** Press **Ctrl-C** in terminal 1. To remove the downloaded images:
+
+   ```bash
+   docker rmi ghcr.io/bronto-community/track-a-agent ghcr.io/bronto-community/ai-sre-agent:step-1 ghcr.io/bronto-community/ai-sre-agent:step-2 ghcr.io/bronto-community/ai-sre-agent:step-3 ghcr.io/bronto-community/ai-sre-agent:step-4 ghcr.io/bronto-community/ai-sre-agent:step-7
+   ```
+
+2. **Delete your `.env`.** It holds your ingestion key, your GitHub token and any LLM key.
+3. **Revoke keys you won't use again**: in Bronto (Settings → API Keys), your GitHub token, and any OpenAI, Anthropic or
+   Google key you created for this.
+4. **AgentCore**, if you deployed it: `agentcore destroy --delete-ecr-repo` from the `agent` folder.
+5. **Your AWS account** closes by itself on the Free plan after 6 months, or when the credits run out. To close it
+   sooner: console → your account name → **Account** → **Close account**.

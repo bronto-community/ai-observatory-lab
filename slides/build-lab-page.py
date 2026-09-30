@@ -78,6 +78,10 @@ strong {{ font-weight: 700; }}
   <img src="/img/bronto-dino.png" alt="">
   <a href="/">← Slides</a> · <a href="{REPO}">GitHub repo</a>
 </div>
+<aside style="background:var(--code-bg);border:1px solid var(--border);border-radius:10px;padding:0.8rem 1rem;margin-bottom:1.5rem">
+  <strong>Doing this on your own?</strong> The self-paced edition, with your own AWS and Bronto accounts, both
+  labs and all three decks, is at <a href="https://ai-observatory-lab.vercel.app">ai-observatory-lab.vercel.app</a>.
+</aside>
 {body}
 </main>
 <script>

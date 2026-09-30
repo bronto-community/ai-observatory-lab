@@ -18,26 +18,11 @@ import time
 
 from bedrock_agentcore import BedrockAgentCoreApp
 from strands import Agent, tool
-from strands.models import BedrockModel
 
+from llm import MODEL_ID, PROVIDER, PROVIDER_NAMES, REGION, estimated_cost, model
 from tools import STEP_2_TOOLS, check_inventory
 
 STEP = int(os.environ.get("AGENT_STEP", "1"))
-MODEL_ID = os.environ.get("BEDROCK_MODEL_ID", "us.anthropic.claude-haiku-4-5-20251001-v1:0")
-REGION = os.environ.get("AWS_REGION") or os.environ.get("AWS_DEFAULT_REGION") or "us-west-2"
-
-# USD per million tokens (input, output), on-demand list prices. Only used for
-# the "estimated cost" field: the GenAI conventions count tokens, not dollars.
-PRICES = {
-    "claude-haiku-4-5": (1.00, 5.00),
-    "claude-sonnet-4-5": (3.00, 15.00),
-    "nova-lite": (0.06, 0.24),
-    "nova-pro": (0.80, 3.20),
-    "nova-micro": (0.035, 0.14),
-    "gpt-oss-120b": (0.15, 0.60),
-    "gpt-oss-20b": (0.07, 0.30),
-}
-
 log = logging.getLogger("storefront-assistant")
 app = BedrockAgentCoreApp()
 
@@ -50,10 +35,6 @@ check stock and suggest up to two in-stock alternatives from the catalogue with 
 Catalogue: blue ceramic mug, espresso cups, walnut cutting board, linen apron, cast iron skillet, french press."""
 
 _sub_usage = {"input": 0, "output": 0, "calls": 0}
-
-
-def model(model_id: str = MODEL_ID) -> BedrockModel:
-    return BedrockModel(model_id=model_id, region_name=REGION, max_tokens=1024)
 
 
 # #region researcher
@@ -82,13 +63,6 @@ def tools_for(step: int) -> list:
     if step == 2:
         return STEP_2_TOOLS
     return STEP_2_TOOLS + [product_researcher]
-
-
-def estimated_cost(model_id: str, tokens_in: int, tokens_out: int) -> float:
-    for key, (p_in, p_out) in PRICES.items():
-        if key in model_id:
-            return round((tokens_in * p_in + tokens_out * p_out) / 1_000_000, 6)
-    return 0.0
 
 
 @app.entrypoint
@@ -131,7 +105,7 @@ def invoke(payload: dict) -> dict:
         "attendee": ATTENDEE,
         "lab.step": STEP,
         "status": status,
-        "gen_ai.provider.name": "aws.bedrock",
+        "gen_ai.provider.name": PROVIDER_NAMES[PROVIDER],
         "gen_ai.operation.name": "invoke_agent",
         "gen_ai.agent.name": "storefront_assistant",
         "gen_ai.request.model": model_id,
@@ -150,7 +124,8 @@ def invoke(payload: dict) -> dict:
         "gen_ai.output.messages": answer,
         "tools.failed": ",".join(failed_tools),
     }
-    log.info("agent.invocation", extra=summary)
+    # OTel log attributes can't be None: leave the cost out when there's no list price.
+    log.info("agent.invocation", extra={k: v for k, v in summary.items() if v is not None})
 
     return {"result": answer, "stats": {k: summary[k] for k in (
         "gen_ai.request.model", "gen_ai.usage.input_tokens", "gen_ai.usage.output_tokens",
@@ -158,6 +133,7 @@ def invoke(payload: dict) -> dict:
 
 
 if __name__ == "__main__":
-    print(f"Storefront assistant, step {STEP}, {MODEL_ID} in {REGION}, attendee={ATTENDEE}", flush=True)
+    where = f" in {REGION}" if PROVIDER == "bedrock" else ""
+    print(f"Storefront assistant, step {STEP}, {PROVIDER}: {MODEL_ID}{where}, attendee={ATTENDEE}", flush=True)
     print("""Try: curl -s localhost:8080/invocations -d '{"prompt": "Where is order 1042?"}'""", flush=True)
     app.run()

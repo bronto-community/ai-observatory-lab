@@ -1,0 +1,205 @@
+export const metadata = { title: "Track A: Observability for AI" };
+
+<div className="kicker">Track A · about 40 minutes</div>
+
+# Observability for AI
+
+Run a small customer assistant for a kitchenware shop. It's built with Strands on Amazon Bedrock and has
+tools, one of which fails on purpose, plus a sub-agent. Then read what it did in your own Bronto: every model call,
+token and tool call, as OpenTelemetry GenAI traces.
+
+Before you start: finish [Start here](/start). The doctor should show three `ok` lines.
+
+<Deck src="https://observability-for-ai-lab.vercel.app" title="Track A slides" />
+
+<OneAtATime />
+
+## Step 1: a model behind an endpoint
+
+<Steps>
+<Step n={1} title="Start the agent (terminal 1)" then="it prints “Storefront assistant, step 1 …”. Leave it running.">
+
+```bash
+docker run --rm -p 8080:8080 --env-file .env -e AGENT_STEP=1 ghcr.io/bronto-community/track-a-agent
+```
+
+</Step>
+<Step n={2} title="Ask it something (terminal 2)" then="you get an answer and a stats block.">
+
+<OSTabs>
+<Tab label="macOS / Linux">
+
+```bash
+curl -s localhost:8080/invocations -d '{"prompt": "Where is order 1042, when will it arrive, and do you still have the blue ceramic mug?"}'
+```
+
+</Tab>
+<Tab label="Windows (PowerShell)">
+
+```powershell
+Invoke-RestMethod localhost:8080/invocations -Method Post -ContentType application/json -Body (@{prompt = "Where is order 1042, when will it arrive, and do you still have the blue ceramic mug?"} | ConvertTo-Json)
+```
+
+</Tab>
+</OSTabs>
+
+It has no tools, so it can't really know. Does it admit that, or make something up?
+
+</Step>
+<Step n={3} title="Find it in Bronto" then="you've found one trace with an invoke_agent span and a chat span.">
+
+In Bronto, open **Traces**, filter `attendee = yourname`, and open the newest trace. On the `chat` span,
+look for `gen_ai.request.model`, `gen_ai.usage.input_tokens` (about 90) and `gen_ai.response.finish_reasons`.
+
+</Step>
+</Steps>
+
+## Step 2: tools, and one that breaks
+
+<Steps>
+<Step n={4} title="Restart with tools (terminal 1)" then="it says step 2. Leave it running.">
+
+Press **Ctrl-C** in terminal 1, then:
+
+```bash
+docker run --rm -p 8080:8080 --env-file .env -e AGENT_STEP=2 ghcr.io/bronto-community/track-a-agent
+```
+
+</Step>
+<Step n={5} title="Ask the same question, three or four times (terminal 2)" then="at least one answer mentions the carrier timing out.">
+
+Use the same command as step 2. `get_shipping_eta` times out about one call in four.
+
+Input tokens jump from about 90 to about 1,900 for the same question: the tool definitions and results now
+travel with every model call.
+
+</Step>
+<Step n={6} title="Find the failing tool in Bronto" then="you've found an execute_tool span with gen_ai.tool.status = error.">
+
+Traces: each tool call is an `execute_tool` span. Then, in **Search**, see what the customer was told when a
+tool failed:
+
+```sql
+"$attendee" = 'yourname' AND "$tools.failed" != ''
+```
+
+</Step>
+</Steps>
+
+## Step 3: a sub-agent, and a second model
+
+<Steps>
+<Step n={7} title="Restart with the sub-agent (terminal 1)" then="it says step 3. Leave it running.">
+
+**Ctrl-C**, then:
+
+```bash
+docker run --rm -p 8080:8080 --env-file .env -e AGENT_STEP=3 ghcr.io/bronto-community/track-a-agent
+```
+
+</Step>
+<Step n={8} title="Ask with Amazon Nova 2 Lite, the default (terminal 2)" then="the stats show subagent_calls 1.">
+
+<OSTabs>
+<Tab label="macOS / Linux">
+
+```bash
+curl -s localhost:8080/invocations -d '{"prompt": "Do you have espresso cups? If not, what would you suggest instead?"}'
+```
+
+</Tab>
+<Tab label="Windows (PowerShell)">
+
+```powershell
+Invoke-RestMethod localhost:8080/invocations -Method Post -ContentType application/json -Body (@{prompt = "Do you have espresso cups? If not, what would you suggest instead?"} | ConvertTo-Json)
+```
+
+</Tab>
+</OSTabs>
+
+</Step>
+<Step n={9} title="Same question, OpenAI gpt-oss-120b on Bedrock (terminal 2)" then="compare the two answers and their stats.">
+
+No restart: the `model` field switches models for one request.
+
+<OSTabs>
+<Tab label="macOS / Linux">
+
+```bash
+curl -s localhost:8080/invocations -d '{"prompt": "Do you have espresso cups? If not, what would you suggest instead?", "model": "openai.gpt-oss-120b-1:0"}'
+```
+
+</Tab>
+<Tab label="Windows (PowerShell)">
+
+```powershell
+Invoke-RestMethod localhost:8080/invocations -Method Post -ContentType application/json -Body (@{prompt = "Do you have espresso cups? If not, what would you suggest instead?"; model = "openai.gpt-oss-120b-1:0"} | ConvertTo-Json)
+```
+
+</Tab>
+</OSTabs>
+
+In the trace, the sub-agent is a whole `invoke_agent product_researcher` nested inside a tool call. Its tokens
+are **not** included in the parent span's total: add them up yourself.
+
+</Step>
+</Steps>
+
+## Step 4: the LLM KPI dashboard
+
+<Steps>
+<Step n={10} title="Make some traffic (terminal 2)" then="20 lines of results, mixing both models.">
+
+Keep the step 3 agent running, then send 20 mixed questions:
+
+<OSTabs>
+<Tab label="macOS / Linux">
+
+```bash
+docker run --rm --network host -e N=20 -e MODELS=us.amazon.nova-2-lite-v1:0,openai.gpt-oss-120b-1:0 -e AGENT_URL=http://host.docker.internal:8080/invocations ghcr.io/bronto-community/track-a-agent python traffic.py
+```
+
+On Linux, replace `host.docker.internal` with `localhost`.
+
+</Tab>
+<Tab label="Windows (PowerShell)">
+
+```powershell
+docker run --rm -e N=20 -e MODELS=us.amazon.nova-2-lite-v1:0,openai.gpt-oss-120b-1:0 -e AGENT_URL=http://host.docker.internal:8080/invocations ghcr.io/bronto-community/track-a-agent python traffic.py
+```
+
+</Tab>
+</OSTabs>
+
+</Step>
+<Step n={11} title="Build the dashboard in your Bronto" then="it prints a dashboard link.">
+
+This uses your Bronto key that can **create dashboards** (from setup step 4). The script has no dependencies
+beyond Python 3. With a US Bronto account, add `-e BRONTO_API_URL=https://api.us.bronto.io`.
+
+```bash
+docker run --rm -e BRONTO_API_KEY=YOUR-DASHBOARD-KEY ghcr.io/bronto-community/track-a-agent python create_dashboard.py
+```
+
+</Step>
+</Steps>
+
+**What the widgets tell you**
+
+| Widget | Why it matters |
+|---|---|
+| Requests, end-to-end latency P95 | what customers wait for, tools and all |
+| Time to first token | what a streaming user feels, per model |
+| Input and output tokens by model | input grows with every loop: history and tool results come along |
+| Model calls per question | the multiplier on cost and latency |
+| Tool calls and tool errors | your dependencies, seen from the agent |
+| Finish reasons | `max_tokens` means a truncated answer |
+| Tokens by agent | what the sub-agent really costs |
+| Estimated spend | tokens × list price. An estimate: the conventions count tokens, not dollars |
+
+<Callout tone="note" title="Two instrumentations, one Bedrock call">
+Each Bedrock call shows up as two `chat` spans: one from Strands (with time to first token) and one from the AWS
+SDK (with the finish reason). The dashboard counts the Strands one, so token totals aren't doubled.
+</Callout>
+
+<NextPage href="/track-b" label="Track B, AI for Observability" />

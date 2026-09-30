@@ -1,0 +1,236 @@
+export const metadata = { title: "Start here" };
+
+<div className="kicker">Setup · about 20 minutes</div>
+
+# Start here
+
+You need four things, all free to start: an **AWS account**, a **Bronto trial**, the **AWS CLI** and **Docker**.
+Everything the labs need then goes into one `.env` file.
+
+<OneAtATime />
+
+## 1. Create your accounts
+
+<Steps>
+<Step n={1} title="An AWS account (Free plan)" then="you can sign in to the AWS console.">
+
+Sign up at [aws.amazon.com/free](https://aws.amazon.com/free/) and choose the **Free plan**. New accounts get
+**$100 in credits** straight away and can earn up to **$100 more** from getting-started activities. The Free plan
+never charges you: when the credits run out, it stops.
+
+Turn on MFA for the root user (console → your account name → **Security credentials**).
+
+</Step>
+<Step n={2} title="Earn $20: try a model in the Bedrock playground" then="the activity shows as complete in the Explore AWS widget.">
+
+On **Console Home**, find the **Explore AWS** widget and open the activity *Use a foundation model in the Amazon
+Bedrock playground*. Switch the console to **US West (Oregon)**, pick **Amazon Nova 2 Lite**, and send any prompt.
+
+This also shows that Bedrock works in your account. Amazon Nova and OpenAI's gpt-oss models need **no access form**;
+the labs only use those.
+
+</Step>
+<Step n={3} title="A Bronto trial (14 days, no credit card)" then="you're in the Bronto app.">
+
+Sign up at [bronto.io/signup](https://bronto.io/signup), with Google or email. Note the **region** you pick, EU or US:
+your ingestion address depends on it.
+
+</Step>
+<Step n={4} title="Two Bronto API keys" then="you have both keys saved somewhere safe.">
+
+In Bronto, go to **Settings → API Keys** ([docs](https://docs.bronto.io/Account-Management/API-Keys)) and create:
+
+- an **ingestion** key: your agent sends its telemetry with it;
+- a key that can **create dashboards** (Standard role), used once in Track A to build the LLM dashboard.
+
+</Step>
+</Steps>
+
+## 2. Install the tools
+
+<Steps>
+<Step n={5} title="Docker" then="the hello-world container prints “Hello from Docker!”.">
+
+Docker Desktop, OrbStack, Colima or Docker Engine. Then check:
+
+```bash
+docker run --rm hello-world
+```
+
+On Linux, if you use `sudo docker`, use `sudo -E docker` in every command so your AWS credentials come along.
+
+</Step>
+<Step n={6} title="The AWS CLI v2" then="aws --version prints aws-cli/2.x.">
+
+<OSTabs>
+<Tab label="macOS / Linux">
+
+macOS with Homebrew:
+
+```bash
+brew install awscli
+```
+
+Linux (x86_64; use `aws-cli-linux-aarch64` on ARM):
+
+```bash
+curl -sSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip && unzip -q awscliv2.zip && sudo ./aws/install
+```
+
+</Tab>
+<Tab label="Windows (PowerShell)">
+
+```powershell
+msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2.msi
+```
+
+Close and reopen PowerShell after the installer finishes.
+
+</Tab>
+</OSTabs>
+
+```bash
+aws --version
+```
+
+</Step>
+</Steps>
+
+## 3. Sign the CLI in
+
+<Steps>
+<Step n={7} title="Log in" then="your browser says you're logged in.">
+
+This opens your browser, signs in with your console login, and gives the CLI short-lived credentials:
+
+```bash
+aws login --region us-west-2
+```
+
+If `aws login` isn't recognised, update the AWS CLI (step 6) and try again.
+
+</Step>
+<Step n={8} title="Check who you are" then="you see your 12-digit account ID.">
+
+```bash
+aws sts get-caller-identity
+```
+
+</Step>
+<Step n={9} title="Check Bedrock from the CLI" then="the model replies with a short greeting.">
+
+The models the labs use, Amazon Nova 2 Lite and OpenAI gpt-oss-120b, need no access form:
+
+<OSTabs>
+<Tab label="macOS / Linux">
+
+```bash
+aws bedrock-runtime converse --region us-west-2 --model-id us.amazon.nova-2-lite-v1:0 --messages '[{"role":"user","content":[{"text":"Say hello in five words"}]}]' --query 'output.message.content[0].text' --output text
+```
+
+</Tab>
+<Tab label="Windows (PowerShell)">
+
+PowerShell mangles JSON quotes passed to programs, so put the message in a file first:
+
+```powershell
+'[{"role":"user","content":[{"text":"Say hello in five words"}]}]' | Set-Content -Encoding ascii msg.json
+aws bedrock-runtime converse --region us-west-2 --model-id us.amazon.nova-2-lite-v1:0 --messages file://msg.json --query "output.message.content[0].text" --output text
+```
+
+</Tab>
+</OSTabs>
+
+</Step>
+</Steps>
+
+## 4. Make your `.env`
+
+The agent runs in Docker. Your `.env` file tells it where to send telemetry, and passes your AWS credentials
+through from the terminal.
+
+<Steps>
+<Step n={10} title="A folder and a .env file" then="the folder has a .env file in it.">
+
+Replace the two placeholders before you paste: your **ingestion key**, and your **name** (lowercase, no spaces).
+With a **US** Bronto account, change `eu` to `us` in the endpoint.
+
+<OSTabs>
+<Tab label="macOS / Linux">
+
+```bash
+mkdir ai-observatory && cd ai-observatory
+cat > .env <<'EOF'
+AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY
+AWS_SESSION_TOKEN
+AWS_REGION=us-west-2
+OTEL_EXPORTER_OTLP_ENDPOINT=https://ingestion.eu.bronto.io
+OTEL_EXPORTER_OTLP_HEADERS=x-bronto-api-key=YOUR-INGESTION-KEY
+ATTENDEE=yourname
+EOF
+```
+
+</Tab>
+<Tab label="Windows (PowerShell)">
+
+```powershell
+mkdir ai-observatory; cd ai-observatory
+@"
+AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY
+AWS_SESSION_TOKEN
+AWS_REGION=us-west-2
+OTEL_EXPORTER_OTLP_ENDPOINT=https://ingestion.eu.bronto.io
+OTEL_EXPORTER_OTLP_HEADERS=x-bronto-api-key=YOUR-INGESTION-KEY
+ATTENDEE=yourname
+"@ | Set-Content -Encoding ascii .env
+```
+
+Keep `-Encoding ascii`: otherwise Windows PowerShell 5.1 can add a byte-order mark and Docker misreads the first line.
+
+</Tab>
+</OSTabs>
+
+The three bare `AWS_…` lines have no values on purpose: Docker copies them from your terminal (next step).
+
+</Step>
+<Step n={11} title="Put your AWS credentials in this terminal" then="the command prints nothing (that's success).">
+
+Run this in every new terminal you start the agent from, and again when the credentials expire (the doctor
+tells you):
+
+<OSTabs>
+<Tab label="macOS / Linux">
+
+```bash
+eval "$(aws configure export-credentials --format env)"
+```
+
+</Tab>
+<Tab label="Windows (PowerShell)">
+
+```powershell
+aws configure export-credentials --format powershell | Invoke-Expression
+```
+
+</Tab>
+</OSTabs>
+
+</Step>
+<Step n={12} title="Run the doctor" then="three lines say ok.">
+
+```bash
+docker run --rm --env-file .env ghcr.io/bronto-community/track-a-agent python doctor.py
+```
+
+It checks your AWS credentials, a real Bedrock call, and that Bronto accepts your ingestion key.
+
+</Step>
+</Steps>
+
+<Callout tone="tip" title="Got an OpenAI, Anthropic or Google key?">
+You can use it instead of Bedrock for Track A. See [Your own LLM key](/byo-llm).
+</Callout>
+
+<NextPage href="/intro" label="the intro talk" />

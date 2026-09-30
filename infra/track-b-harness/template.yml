@@ -1,0 +1,93 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  Always-on Track B demo: runs the Storefront harness (Severin's ai-sre-lab
+  demo) on one small instance and replays the checkout incident every hour,
+  sending its telemetry to the Bronto workshop org. No inbound ports; manage
+  it with SSM Session Manager.
+
+Parameters:
+  BrontoIngestionKey:
+    Type: String
+    NoEcho: true
+    Description: Ingestion key of the Bronto org the Storefront telemetry goes to.
+  InstanceType:
+    Type: String
+    Default: t4g.small
+  AmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-arm64
+
+Resources:
+  HarnessBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault: { SSEAlgorithm: AES256 }
+
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: ec2.amazonaws.com }
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Policies:
+        - PolicyName: read-harness
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource: !Sub "${HarnessBucket.Arn}/*"
+
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles: [!Ref InstanceRole]
+
+  EgressOnly:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Track B harness, outbound only
+      SecurityGroupEgress:
+        - { IpProtocol: "-1", CidrIp: 0.0.0.0/0 }
+
+  Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref AmiId
+      InstanceType: !Ref InstanceType
+      IamInstanceProfile: !Ref InstanceProfile
+      SecurityGroupIds: [!GetAtt EgressOnly.GroupId]
+      MetadataOptions: { HttpTokens: required }
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs: { VolumeSize: 30, VolumeType: gp3, Encrypted: true }
+      Tags:
+        - { Key: Name, Value: ai-observatory-track-b-harness }
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          # The harness tarball may land a moment after the stack: wait for it.
+          for i in $(seq 1 60); do
+            aws s3 cp "s3://${HarnessBucket}/bootstrap.sh" /root/bootstrap.sh && break
+            sleep 10
+          done
+          BUCKET="${HarnessBucket}" BRONTO_API_KEY="${BrontoIngestionKey}" bash /root/bootstrap.sh
+
+Outputs:
+  HarnessBucket:
+    Value: !Ref HarnessBucket
+  InstanceId:
+    Value: !Ref Instance

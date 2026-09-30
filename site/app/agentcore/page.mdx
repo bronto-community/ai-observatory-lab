@@ -1,0 +1,58 @@
+export const metadata = { title: "Deploy to AgentCore Runtime" };
+
+<div className="kicker">Track A · optional · AWS Paid plan</div>
+
+# Run the same agent on AgentCore Runtime
+
+On the live evening, the Track A agent also ran on **Amazon Bedrock AgentCore Runtime**, sending its traces to
+Bronto next to everyone's laptops. Only the environment changes: the code is identical.
+
+<Callout tone="warn" title="Needs the AWS Paid plan">
+AgentCore is not available on the AWS Free plan. You can
+[upgrade your account](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html) to the Paid
+plan: your credits still apply, but anything beyond them is billed.
+</Callout>
+
+<Steps>
+<Step n={1} title="Get the code and the AgentCore CLI" then="agentcore --help prints its commands.">
+
+Needs [uv](https://docs.astral.sh/uv/) and git.
+
+```bash
+git clone https://github.com/bronto-community/track-a-observability-for-ai && cd track-a-observability-for-ai/agent
+```
+
+```bash
+uvx --from bedrock-agentcore-starter-toolkit agentcore --help
+```
+
+</Step>
+<Step n={2} title="Configure" then="it saves .bedrock_agentcore.yaml.">
+
+`direct_code_deploy` uploads the code to S3 and runs it as is. It doesn't need a container build in CodeBuild.
+
+```bash
+uvx --from bedrock-agentcore-starter-toolkit agentcore configure -e agent.py -n storefront_assistant -r us-west-2 -rf requirements.txt --disable-otel --disable-memory --deployment-type direct_code_deploy --runtime PYTHON_3_13 --non-interactive
+```
+
+</Step>
+<Step n={3} title="Deploy, pointing the telemetry at Bronto" then="it prints the agent ARN.">
+
+Pass these on **every** deploy: they aren't remembered.
+
+```bash
+uvx --from bedrock-agentcore-starter-toolkit agentcore deploy --env DISABLE_ADOT_OBSERVABILITY=true --env OTEL_EXPORTER_OTLP_ENDPOINT=https://ingestion.eu.bronto.io --env OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf --env "OTEL_EXPORTER_OTLP_HEADERS=x-bronto-api-key=YOUR-INGESTION-KEY" --env BEDROCK_MODEL_ID=us.amazon.nova-2-lite-v1:0 --env AGENT_STEP=3 --env ATTENDEE=agentcore
+```
+
+</Step>
+<Step n={4} title="Invoke it" then="an answer. Filter Bronto on attendee = agentcore.">
+
+```bash
+uvx --from bedrock-agentcore-starter-toolkit agentcore invoke '{"prompt": "Do you have espresso cups?"}'
+```
+
+</Step>
+</Steps>
+
+Leave out the four `OTEL`/`DISABLE_ADOT` flags and AgentCore sends the same spans to CloudWatch GenAI Observability
+instead. To remove everything it created: `agentcore destroy --delete-ecr-repo`.

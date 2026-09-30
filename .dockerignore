@@ -1,0 +1,9 @@
+node_modules
+**/node_modules
+site
+slides
+bug-report
+workshop
+.env
+.git
+**/__pycache__

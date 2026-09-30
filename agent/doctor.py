@@ -1,7 +1,8 @@
-"""Preflight: docker compose run --rm doctor
+"""Preflight: docker run --rm --env-file .env <image> python doctor.py
 
-Checks, in the order they usually break: AWS credentials, region, Bedrock
-model access, and the Bronto ingestion key.
+Checks, in the order they usually break: the model (AWS credentials and
+Bedrock access, or your OpenAI / Anthropic / Gemini key) and the Bronto
+ingestion key.
 """
 
 import json
@@ -13,8 +14,7 @@ import urllib.request
 
 import boto3
 
-REGION = os.environ.get("AWS_REGION", "us-west-2")
-MODEL_ID = os.environ.get("BEDROCK_MODEL_ID", "us.anthropic.claude-haiku-4-5-20251001-v1:0")
+from llm import MODEL_ID, PROVIDER, REGION, model
 ENDPOINT = os.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT", "https://ingestion.eu.bronto.io")
 failed = False
 
@@ -41,6 +41,13 @@ def bedrock():
     return f"{MODEL_ID} answered in {r['metrics']['latencyMs']} ms"
 
 
+def vendor_model():
+    from strands import Agent
+    started = time.perf_counter()
+    Agent(model=model(), callback_handler=None)("Reply with the single word OK")
+    return f"{PROVIDER} {MODEL_ID} answered in {round((time.perf_counter() - started) * 1000)} ms"
+
+
 def bronto():
     header = os.environ.get("OTEL_EXPORTER_OTLP_HEADERS", "")
     if "x-bronto-api-key=" not in header or "PASTE-KEY-HERE" in header:
@@ -61,11 +68,14 @@ def bronto():
         raise RuntimeError(f"HTTP {e.code}: wrong key, or a US key against the EU endpoint?") from None
 
 
-print(f"Track A doctor  (region {REGION}, attendee {os.environ.get('ATTENDEE', '?')})")
-check("AWS credentials", aws_identity)
-check("Bedrock model access", bedrock)
+print(f"Track A doctor  (provider {PROVIDER}, model {MODEL_ID}, attendee {os.environ.get('ATTENDEE', '?')})")
+if PROVIDER == "bedrock":
+    check("AWS credentials", aws_identity)
+    check("Bedrock model access", bedrock)
+else:
+    check(f"{PROVIDER} API key and model", vendor_model)
 check("Bronto ingestion", bronto)
 if failed:
-    print("\nFix the FAIL lines above. Expired workshop credentials? Copy fresh ones from the workshop page and paste them into this terminal again.")
+    print("\nFix the FAIL lines above. Expired AWS credentials? Refresh them (aws login, then re-export into .env) and run the doctor again.")
     sys.exit(1)
 print("\nAll good. Start step 1 (same command on macOS, Linux and Windows):\n  docker run --rm -p 8080:8080 --env-file .env -e AGENT_STEP=1 ghcr.io/bronto-community/track-a-agent")

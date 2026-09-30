@@ -2,7 +2,9 @@
 # Your own account: `export AWS_PROFILE=yourprofile` (~/.aws is mounted read-only).
 x-agent: &agent
   image: ${AGENT_IMAGE:-ghcr.io/bronto-community/track-a-agent:latest}
-  build: ./agent
+  build:
+    context: .
+    dockerfile: agent/Dockerfile
   env_file: .env
   environment:
     - AWS_ACCESS_KEY_ID
@@ -11,7 +13,7 @@ x-agent: &agent
     - AWS_PROFILE
     - AWS_REGION=${AWS_REGION:-us-west-2}
     - AGENT_STEP=${AGENT_STEP:-1}
-    - BEDROCK_MODEL_ID=${BEDROCK_MODEL_ID:-us.anthropic.claude-haiku-4-5-20251001-v1:0}
+    - BEDROCK_MODEL_ID=${BEDROCK_MODEL_ID:-us.amazon.nova-2-lite-v1:0}
   volumes:
     - ${HOME}/.aws:/root/.aws:ro
 

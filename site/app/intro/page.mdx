@@ -1,0 +1,21 @@
+export const metadata = { title: "Intro talk" };
+
+<div className="kicker">25 minutes · talk</div>
+
+# An Evening at the AI Observatory
+
+The framing talk that opened the evening. Two readings of one title: **observability for AI** (the agent is a
+system you need to see inside) and **AI for observability** (a model pointed back at the telemetry to work an
+incident). The two labs take one direction each.
+
+<Deck src="https://ai-observatory-talk.vercel.app" title="An Evening at the AI Observatory" />
+
+**Key ideas to take into the labs**
+
+- An agent is a service in someone's request: tracing ties it to the transaction it belongs to.
+- It also needs its own vocabulary: tokens, tool calls, the prompt. The OpenTelemetry GenAI conventions provide it,
+  and frameworks like Strands already emit it.
+- Pointed the other way, a model is good at the half of an incident that lives in prose: commits, runbooks,
+  threads. It can only conclude what it can retrieve.
+
+<NextPage href="/track-a" label="Track A, Observability for AI" />

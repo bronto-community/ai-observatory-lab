@@ -1,11 +1,16 @@
 # Track A: Observability for AI
 
+> **Doing this lab on your own?** Start at **[ai-observatory-lab.vercel.app](https://ai-observatory-lab.vercel.app)**:
+> the self-paced edition, with your own AWS account (Free plan credits cover it) and your own Bronto trial
+> (14 days, no credit card), Track B, and bring-your-own OpenAI / Anthropic / Google key.
+> The rest of this README is the version used on the live evening, with AWS workshop accounts.
+
 A small customer-assistant agent (Strands on Amazon Bedrock) that sends its
 OpenTelemetry traces, logs and metrics to Bronto. You run it in Docker, ask
 it questions, and read what it did: model calls, tokens, tool calls, a
 failing tool, a sub-agent.
 
-Slides: <https://observability-for-ai-lab.vercel.app> · This guide as a web page: <https://observability-for-ai-lab.vercel.app/lab>
+Slides: <https://observability-for-ai-lab.vercel.app> · Self-paced hub: <https://ai-observatory-lab.vercel.app>
 
 ## Run it
 

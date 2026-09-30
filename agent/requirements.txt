@@ -1,4 +1,4 @@
-strands-agents>=1.10
+strands-agents[openai,anthropic,gemini]>=1.57
 bedrock-agentcore>=0.1.7
 boto3>=1.40
 opentelemetry-sdk>=1.37

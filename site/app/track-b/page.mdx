@@ -1,0 +1,254 @@
+export const metadata = { title: "Track B: AI for Observability" };
+
+<div className="kicker">Track B · about 45 minutes · by Severin Neumann</div>
+
+# AI for Observability: build your own AI SRE
+
+Build an investigating agent in seven steps: a loop, an identity, eyes (Bronto MCP), a mouth (a GitHub issue),
+better instructions, a better model, and the code. It works a real incident on **Storefront**, a small online shop
+whose telemetry runs continuously in a shared Bronto demo org.
+
+<Deck src="https://aisre-lab.vercel.app" title="Track B slides" />
+
+<Callout tone="note" title="The demo incident runs on a schedule">
+Every hour, Storefront runs normally until **:15**, then a new release of `checkout-api` ships and checkouts get
+slow until the top of the hour. For the best investigation, ask between **:20 and :59**. Then there's a quiet
+baseline to compare against and a live incident.
+</Callout>
+
+## Before you start
+
+You need the `ai-observatory` folder and `.env` from [Start here](/start), and your AWS credentials in the
+terminal (setup step 11). Two extra accounts:
+
+- **GitHub**: an account, and a new empty **public** repository for the agent's reports, for example
+  `ai-sre-issues`.
+- **A GitHub token**: [create a fine-grained token](https://github.com/settings/personal-access-tokens/new),
+  **Only select repositories →** your `ai-sre-issues`, permission **Issues: Read and write**. Public repositories,
+  like Storefront's code, can always be read.
+
+<Steps>
+<Step n={1} title="Add Track B's settings to your .env" then="your .env has four more lines.">
+
+The Bronto key below is a **read-only** key for the shared demo org. It's meant to be public. Put in your GitHub
+username and token.
+
+<OSTabs>
+<Tab label="macOS / Linux">
+
+```bash
+cat >> .env <<'EOF'
+BEDROCK_MODEL_ID=us.amazon.nova-2-lite-v1:0
+BRONTO_API_KEY=13a79ead-d125-4f71-ab4d-c579119c7e1c.tUqIG3BTaonVJi_fdFldd8QjtfIcGzr4ZQfYJoXqXRo=
+GITHUB_REPO=YOUR-GITHUB-USER/ai-sre-issues
+GITHUB_TOKEN=YOUR-GITHUB-TOKEN
+EOF
+```
+
+</Tab>
+<Tab label="Windows (PowerShell)">
+
+```powershell
+@"
+BEDROCK_MODEL_ID=us.amazon.nova-2-lite-v1:0
+BRONTO_API_KEY=13a79ead-d125-4f71-ab4d-c579119c7e1c.tUqIG3BTaonVJi_fdFldd8QjtfIcGzr4ZQfYJoXqXRo=
+GITHUB_REPO=YOUR-GITHUB-USER/ai-sre-issues
+GITHUB_TOKEN=YOUR-GITHUB-TOKEN
+"@ | Add-Content -Encoding ascii .env
+```
+
+</Tab>
+</OSTabs>
+
+Stop the Track A agent first (**Ctrl-C**): both labs use port 8080.
+
+</Step>
+</Steps>
+
+<OneAtATime />
+
+## Step 1: the loop
+
+<Steps>
+<Step n={2} title="Start the agent (terminal 1)" then="it's listening on port 8080. Leave it running.">
+
+```bash
+docker run --rm -p 8080:8080 --env-file .env ghcr.io/bronto-community/ai-sre-agent:step-1
+```
+
+</Step>
+<Step n={3} title="Ask it something (terminal 2)" then="it answers as a general assistant.">
+
+<OSTabs>
+<Tab label="macOS / Linux">
+
+```bash
+curl -s localhost:8080/invocations -d '{"prompt": "Who are you?"}'
+```
+
+</Tab>
+<Tab label="Windows (PowerShell)">
+
+```powershell
+Invoke-RestMethod localhost:8080/invocations -Method Post -ContentType application/json -Body (@{prompt = "Who are you?"} | ConvertTo-Json)
+```
+
+</Tab>
+</OSTabs>
+
+</Step>
+</Steps>
+
+## Step 2: an identity
+
+<Steps>
+<Step n={4} title="Write your own rules into my.md" then="the folder has a my.md file.">
+
+<OSTabs>
+<Tab label="macOS / Linux">
+
+```bash
+cat > my.md <<'EOF'
+- Answer in at most three bullet points.
+- End every answer with your confidence: low, medium or high.
+- Sign off as "your friendly on-call dino".
+EOF
+```
+
+</Tab>
+<Tab label="Windows (PowerShell)">
+
+```powershell
+@"
+- Answer in at most three bullet points.
+- End every answer with your confidence: low, medium or high.
+- Sign off as "your friendly on-call dino".
+"@ | Set-Content -Encoding ascii my.md
+```
+
+</Tab>
+</OSTabs>
+
+</Step>
+<Step n={5} title="Start step 2 with your rules (terminal 1)" then="it's running. Leave it.">
+
+**Ctrl-C**, then:
+
+<OSTabs>
+<Tab label="macOS / Linux">
+
+```bash
+docker run --rm -p 8080:8080 --env-file .env -v "$PWD/my.md:/app/prompts/my.md" ghcr.io/bronto-community/ai-sre-agent:step-2
+```
+
+</Tab>
+<Tab label="Windows (PowerShell)">
+
+```powershell
+docker run --rm -p 8080:8080 --env-file .env -v "${PWD}\my.md:/app/prompts/my.md" ghcr.io/bronto-community/ai-sre-agent:step-2
+```
+
+</Tab>
+</OSTabs>
+
+</Step>
+<Step n={6} title="Ask it to investigate (terminal 2)" then="it says, honestly, that it can't see any telemetry.">
+
+Ask: **"Checkout is slow. What is wrong?"**. Use the same command as step 3 with that prompt.
+
+</Step>
+</Steps>
+
+## Step 3: eyes (Bronto MCP)
+
+<Steps>
+<Step n={7} title="Start step 3 (terminal 1)" then="it's running. Leave it.">
+
+**Ctrl-C**, then the step 5 command with `step-3` at the end instead of `step-2`.
+
+</Step>
+<Step n={8} title="Ask what it can see, then what's wrong (terminal 2)" then="it names checkout, payments, catalog and web, and finds something in checkout.">
+
+First **"What services do you know about?"**, then **"Anything wrong with checkout?"**
+
+</Step>
+</Steps>
+
+## Step 4: a mouth (a GitHub issue)
+
+<Steps>
+<Step n={9} title="Start step 4 (terminal 1)" then="it's running. Leave it.">
+
+**Ctrl-C**, then the step 5 command with `step-4`.
+
+</Step>
+<Step n={10} title="Ask, then open the issue (terminal 2)" then="the answer is a link to a new issue in your ai-sre-issues repo.">
+
+Ask **"Anything wrong with checkout?"** Read the hypothesis. Is it right? How confident is it?
+
+</Step>
+</Steps>
+
+## Step 5: better instructions
+
+<Steps>
+<Step n={11} title="Teach it how you investigate" then="my.md has three more rules.">
+
+Add these to the end of `my.md`:
+
+```md
+- Slow is broken too: compare latency (p50, p95) before and after, not only errors.
+- Compare against a quiet window earlier the same day.
+- Look for `deploy` spans near the onset: they name the commit that went live.
+```
+
+</Step>
+<Step n={12} title="Restart step 4 and ask again" then="a second issue: better, worse, or out of context?">
+
+**Ctrl-C** and run step 4 again (the prompt files are read at start-up). Ask: **"Customers say checkout got slow in
+the last 30 minutes. What is going on?"**
+
+</Step>
+</Steps>
+
+## Step 6: a different model
+
+<Steps>
+<Step n={13} title="Switch to OpenAI gpt-oss-120b" then="compare the two issues: what changed with the model alone?">
+
+In `.env`, change the model line to:
+
+```ini
+BEDROCK_MODEL_ID=openai.gpt-oss-120b-1:0
+```
+
+**Ctrl-C**, run step 4 again, and ask the same question.
+
+</Step>
+</Steps>
+
+## Step 7: the code
+
+<Steps>
+<Step n={14} title="Start step 7 (terminal 1)" then="it's running. Leave it.">
+
+**Ctrl-C**, then the step 5 command with `step-7`. The agent can now read Storefront's source on GitHub, and every
+service reports the commit it runs.
+
+</Step>
+<Step n={15} title="Ask again (terminal 2)" then="does it find the deploy, open the release, and pick the right commit?">
+
+Ask: **"Customers say checkout got slow in the last 30 minutes. What is going on?"** The release has three commits,
+and two of them are decoys.
+
+</Step>
+</Steps>
+
+## What you built, and what's next
+
+A trigger (your curl), a loop (Strands on Bedrock), context (the prompt files), tools (Bronto and GitHub MCP), and an
+output (a GitHub issue). The managed version of all of this is
+[AWS DevOps Agent](https://docs.aws.amazon.com/devopsagent/). Having built one, you know what's inside, and what it
+can't see.
+
+<NextPage href="/byo-llm" label="use your own LLM key" />

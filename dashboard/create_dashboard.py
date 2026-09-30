@@ -27,7 +27,7 @@ from typing import Any
 
 BASE_URL = os.environ.get("BRONTO_API_URL", "https://api.eu.bronto.io")
 NAME = "LLM KPIs — Storefront Assistant"
-STATE = Path(__file__).with_name("state.json")
+STATE = Path(os.environ.get("DASHBOARD_STATE", Path(__file__).with_name("state.json")))
 
 TRACES = "\"collection\" = '.traces' AND \"dataset\" = 'storefront-assistant'"
 LOGS = "\"collection\" = 'aws-ai-workshop' AND \"dataset\" = 'storefront-assistant'"

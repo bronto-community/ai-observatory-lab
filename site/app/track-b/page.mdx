@@ -31,14 +31,15 @@ terminal (setup step 11). Two extra accounts:
 <Step n={1} title="Add Track B's settings to your .env" then="your .env has four more lines.">
 
 The Bronto key below is a **read-only** key for the shared demo org. It's meant to be public. Put in your GitHub
-username and token.
+username and token. The model is OpenAI's gpt-oss-120b on Bedrock: no access form, and in testing the best
+investigator of the form-free models. Its answers sometimes include its working notes: that's the model, not you.
 
 <OSTabs>
 <Tab label="macOS / Linux">
 
 ```bash
 cat >> .env <<'EOF'
-BEDROCK_MODEL_ID=us.amazon.nova-2-lite-v1:0
+BEDROCK_MODEL_ID=openai.gpt-oss-120b-1:0
 BRONTO_API_KEY=13a79ead-d125-4f71-ab4d-c579119c7e1c.tUqIG3BTaonVJi_fdFldd8QjtfIcGzr4ZQfYJoXqXRo=
 GITHUB_REPO=YOUR-GITHUB-USER/ai-sre-issues
 GITHUB_TOKEN=YOUR-GITHUB-TOKEN
@@ -50,7 +51,7 @@ EOF
 
 ```powershell
 @"
-BEDROCK_MODEL_ID=us.amazon.nova-2-lite-v1:0
+BEDROCK_MODEL_ID=openai.gpt-oss-120b-1:0
 BRONTO_API_KEY=13a79ead-d125-4f71-ab4d-c579119c7e1c.tUqIG3BTaonVJi_fdFldd8QjtfIcGzr4ZQfYJoXqXRo=
 GITHUB_REPO=YOUR-GITHUB-USER/ai-sre-issues
 GITHUB_TOKEN=YOUR-GITHUB-TOKEN
@@ -214,12 +215,12 @@ the last 30 minutes. What is going on?"**
 ## Step 6: a different model
 
 <Steps>
-<Step n={13} title="Switch to OpenAI gpt-oss-120b" then="compare the two issues: what changed with the model alone?">
+<Step n={13} title="Switch to Amazon Nova 2 Lite" then="compare the two issues: what changed with the model alone?">
 
 In `.env`, change the model line to:
 
 ```ini
-BEDROCK_MODEL_ID=openai.gpt-oss-120b-1:0
+BEDROCK_MODEL_ID=us.amazon.nova-2-lite-v1:0
 ```
 
 **Ctrl-C**, run step 4 again, and ask the same question.
@@ -239,7 +240,8 @@ service reports the commit it runs.
 <Step n={15} title="Ask again (terminal 2)" then="does it find the deploy, open the release, and pick the right commit?">
 
 Ask: **"Customers say checkout got slow in the last 30 minutes. What is going on?"** The release has three commits,
-and two of them are decoys.
+and two of them are decoys. If it stops at the deploy, ask the follow-up: **"Which change in that release caused it?
+Read the code."**
 
 </Step>
 </Steps>

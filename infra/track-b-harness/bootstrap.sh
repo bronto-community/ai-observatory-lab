@@ -23,7 +23,7 @@ if ! docker compose version >/dev/null 2>&1; then
 fi
 
 mkdir -p /opt/lab && cd /opt/lab
-aws s3 cp -q "s3://$BUCKET/harness.tgz" /tmp/harness.tgz
+aws s3 cp --quiet "s3://$BUCKET/harness.tgz" /tmp/harness.tgz
 rm -rf demo && tar -xzf /tmp/harness.tgz
 bash demo/setup-host.sh
 
@@ -56,6 +56,7 @@ for action in rollback release; do
 Description=Storefront harness: $action at $when
 [Timer]
 OnCalendar=$when
+Unit=storefront@$action.service
 Persistent=false
 [Install]
 WantedBy=timers.target

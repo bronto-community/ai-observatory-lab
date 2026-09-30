@@ -58,9 +58,8 @@ Resources:
   EgressOnly:
     Type: AWS::EC2::SecurityGroup
     Properties:
+      # No ingress rules; a new security group allows all outbound by default.
       GroupDescription: Track B harness, outbound only
-      SecurityGroupEgress:
-        - { IpProtocol: "-1", CidrIp: 0.0.0.0/0 }
 
   Instance:
     Type: AWS::EC2::Instance

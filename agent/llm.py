@@ -5,7 +5,7 @@ picks the model. Bedrock is the default and uses your AWS credentials; the
 others need their own API key in the environment:
 
   LLM_PROVIDER  key needed          default model
-  bedrock       AWS credentials     us.amazon.nova-2-lite-v1:0   (no access form)
+  bedrock       AWS credentials     global.amazon.nova-2-lite-v1:0   (no access form)
   openai        OPENAI_API_KEY      gpt-5.4-mini
   anthropic     ANTHROPIC_API_KEY   claude-haiku-4-5-20251001
   gemini        GEMINI_API_KEY      gemini-3.8-flash
@@ -20,7 +20,7 @@ PROVIDER = os.environ.get("LLM_PROVIDER", "bedrock").strip().lower()
 REGION = os.environ.get("AWS_REGION") or os.environ.get("AWS_DEFAULT_REGION") or "us-west-2"
 
 DEFAULTS = {
-    "bedrock": "us.amazon.nova-2-lite-v1:0",
+    "bedrock": "global.amazon.nova-2-lite-v1:0",
     "openai": "gpt-5.4-mini",
     "anthropic": "claude-haiku-4-5-20251001",
     "gemini": "gemini-3.8-flash",

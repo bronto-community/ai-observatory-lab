@@ -2,8 +2,8 @@
 https://docs.bronto.io/ai-features/aws-agentcore
 
 One Resource shared by traces, metrics and logs. Everything is exported over
-OTLP/HTTP to whatever OTEL_EXPORTER_OTLP_ENDPOINT says (Bronto, in this lab),
-with the API key in OTEL_EXPORTER_OTLP_HEADERS. Call setup_telemetry() before
+OTLP/HTTP to Bronto in BRONTO_REGION (eu or us), or to whatever
+OTEL_EXPORTER_OTLP_ENDPOINT says, with the API key in OTEL_EXPORTER_OTLP_HEADERS. Call setup_telemetry() before
 importing Strands.
 """
 
@@ -12,6 +12,10 @@ import logging
 import os
 from collections.abc import Mapping
 
+BRONTO_REGION = os.environ.get("BRONTO_REGION", "eu").strip().lower() or "eu"
+if BRONTO_REGION not in ("eu", "us"):
+    raise SystemExit(f"BRONTO_REGION={BRONTO_REGION!r}: use eu or us (it's in your Bronto address, app.eu or app.us)")
+os.environ.setdefault("OTEL_EXPORTER_OTLP_ENDPOINT", f"https://ingestion.{BRONTO_REGION}.bronto.io")
 os.environ.setdefault("OTEL_SEMCONV_STABILITY_OPT_IN", "gen_ai_latest_experimental,gen_ai_tool_definitions")
 # Botocore's GenAI events carry the prompt and reply text only when this is set.
 os.environ.setdefault("OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT", "true")

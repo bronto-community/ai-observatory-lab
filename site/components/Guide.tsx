@@ -72,17 +72,17 @@ export function Requirements() {
         <tr>
           <td>A Bronto account</td>
           <td>
-            A new <a href="https://bronto.io/signup" target="_blank" rel="noopener">trial</a> (14 days, no credit card) or
-            one you already have, with two API keys you create: <strong>ingestion</strong> and <strong>dashboards</strong>.
-            Track B reads a shared demo org with a key we provide.
+            <strong>Your own</strong>, EU or US: a new <a href="https://bronto.io/signup" target="_blank" rel="noopener">trial</a>{" "}
+            (no credit card) or one you already have, with two API keys you create: <strong>ingestion</strong> and{" "}
+            <strong>dashboards</strong>. Track A sends your agent&rsquo;s telemetry here. Track B doesn&rsquo;t use it:
+            its agent reads a <strong>shared Bronto demo org</strong> with a read-only key we provide.
           </td>
           <td className="who">Track A</td>
         </tr>
         <tr>
           <td>An LLM, one of</td>
           <td>
-            <strong>An AWS account</strong> for Amazon Bedrock (new or existing; the Free plan&rsquo;s credits cover the
-            labs), <strong>or your own API key</strong> from OpenAI, Anthropic or Google.
+            <strong>An AWS account</strong> for Amazon Bedrock (new or existing), <strong>or your own API key</strong> from OpenAI, Anthropic or Google.
           </td>
           <td className="who">A and B</td>
         </tr>

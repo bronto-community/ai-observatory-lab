@@ -28,7 +28,7 @@ QUESTIONS = [
 
 
 def short(model_id: str) -> str:
-    """us.amazon.nova-2-lite-v1:0 -> nova-2-lite-v1:0; vendor IDs stay as they are."""
+    """global.amazon.nova-2-lite-v1:0 -> nova-2-lite-v1:0; vendor IDs stay as they are."""
     return re.sub(r"^((us|eu|apac|global)\.)?(amazon|openai|anthropic|meta)\.", "", model_id)
 
 

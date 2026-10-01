@@ -3,10 +3,11 @@
 > **Doing the labs on your own?** Start at **[ai-observatory-lab.vercel.app](https://ai-observatory-lab.vercel.app)**:
 > the self-paced edition of both labs (Track A here, and Track B, Severin Neumann's AI SRE). You need:
 >
-> - **A Bronto account**: a new trial (14 days, no credit card) or your own, with an ingestion key and a key that
->   can create dashboards. Track B reads a shared demo org with a key the guide provides.
-> - **An LLM**: an AWS account for Amazon Bedrock (the Free plan's credits cover it), **or** your own OpenAI,
->   Anthropic or Google API key.
+> - **Your own Bronto account**, EU or US: a new trial (no credit card) or an existing one, with an ingestion key
+>   and a key that can create dashboards. Track A sends everything here. Track B doesn't use it: its agent reads a
+>   shared Bronto demo org with a public read-only key the guide provides.
+> - **An LLM**: an AWS account for Amazon Bedrock (any region with the lab's models; us-west-2 by default),
+>   **or** your own OpenAI, Anthropic or Google API key.
 > - **Docker**, and the **AWS CLI v2** if you use AWS.
 > - For Track B: a **GitHub** account, an empty public repo and a fine-grained token.
 >

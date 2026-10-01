@@ -8,6 +8,11 @@ Run a small customer assistant for a kitchenware shop. It's built with Strands, 
 OpenAI, Anthropic or Google key, and has tools, one of which fails on purpose, plus a sub-agent. Then read what it did in your own Bronto: every model call,
 token and tool call, as OpenTelemetry GenAI traces.
 
+<Callout tone="note" title="Bronto account: yours">
+Everything in Track A goes to **your own Bronto account** from setup, EU or US: the traces, the logs and the
+dashboard. Nobody else sees them.
+</Callout>
+
 Before you start: finish [Start here](/start). The doctor should end with “All good”. On the AWS route, put your
 credentials in each new terminal first (setup step 4.2).
 
@@ -173,7 +178,7 @@ on your own key, replace it, for example `MODELS=gpt-5.4-mini,gpt-5.4`:
 <Tab label="macOS / Linux">
 
 ```bash
-docker run --rm --network host -e N=20 -e MODELS=us.amazon.nova-2-lite-v1:0,openai.gpt-oss-120b-1:0 -e AGENT_URL=http://host.docker.internal:8080/invocations ghcr.io/bronto-community/track-a-agent python traffic.py
+docker run --rm --network host -e N=20 -e MODELS=global.amazon.nova-2-lite-v1:0,openai.gpt-oss-120b-1:0 -e AGENT_URL=http://host.docker.internal:8080/invocations ghcr.io/bronto-community/track-a-agent python traffic.py
 ```
 
 On Linux, replace `host.docker.internal` with `localhost`.
@@ -182,7 +187,7 @@ On Linux, replace `host.docker.internal` with `localhost`.
 <Tab label="Windows (PowerShell)">
 
 ```powershell
-docker run --rm -e N=20 -e MODELS=us.amazon.nova-2-lite-v1:0,openai.gpt-oss-120b-1:0 -e AGENT_URL=http://host.docker.internal:8080/invocations ghcr.io/bronto-community/track-a-agent python traffic.py
+docker run --rm -e N=20 -e MODELS=global.amazon.nova-2-lite-v1:0,openai.gpt-oss-120b-1:0 -e AGENT_URL=http://host.docker.internal:8080/invocations ghcr.io/bronto-community/track-a-agent python traffic.py
 ```
 
 </Tab>
@@ -191,11 +196,11 @@ docker run --rm -e N=20 -e MODELS=us.amazon.nova-2-lite-v1:0,openai.gpt-oss-120b
 </Step>
 <Step n={11} title="Build the dashboard in your Bronto" then="it prints a dashboard link.">
 
-This uses your Bronto key that can **create dashboards** (from setup step 4). The script has no dependencies
-beyond Python 3. With a US Bronto account, add `-e BRONTO_API_URL=https://api.us.bronto.io`.
+This uses your Bronto key that can **create dashboards** (setup step 1.2), and `BRONTO_REGION` from your `.env`
+to find your account, EU or US.
 
 ```bash
-docker run --rm -e BRONTO_API_KEY=YOUR-DASHBOARD-KEY ghcr.io/bronto-community/track-a-agent python create_dashboard.py
+docker run --rm --env-file .env -e BRONTO_API_KEY=YOUR-DASHBOARD-KEY ghcr.io/bronto-community/track-a-agent python create_dashboard.py
 ```
 
 </Step>

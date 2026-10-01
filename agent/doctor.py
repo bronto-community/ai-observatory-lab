@@ -15,7 +15,8 @@ import urllib.request
 import boto3
 
 from llm import MODEL_ID, PROVIDER, REGION, model
-ENDPOINT = os.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT", "https://ingestion.eu.bronto.io")
+REGION_BRONTO = os.environ.get("BRONTO_REGION", "eu").strip().lower() or "eu"
+ENDPOINT = os.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT") or f"https://ingestion.{REGION_BRONTO}.bronto.io"
 failed = False
 
 
@@ -65,7 +66,7 @@ def bronto():
         with urllib.request.urlopen(req, timeout=15) as r:
             return f"{ENDPOINT} accepted a test event (HTTP {r.status})"
     except urllib.error.HTTPError as e:
-        raise RuntimeError(f"HTTP {e.code}: wrong key, or a US key against the EU endpoint?") from None
+        raise RuntimeError(f"HTTP {e.code}: wrong key, or the wrong BRONTO_REGION? (eu or us, as in your app.eu / app.us address)") from None
 
 
 print(f"Track A doctor  (provider {PROVIDER}, model {MODEL_ID}, attendee {os.environ.get('ATTENDEE', '?')})")

@@ -18,19 +18,19 @@ export default function Home() {
         <img src="/img/dino-scientist.png" alt="The Bronto dinosaur in a lab coat" className="lineart" />
       </section>
 
-      <section className="offers" aria-label="Free offers">
+      <section className="offers" aria-label="What you start with">
         <div className="offer">
           <div className="kicker">Bronto</div>
-          <div className="big">14 days free, no credit card</div>
+          <div className="big">Free trial, no credit card</div>
           <p>Logs, traces and metrics, with the Bronto MCP server for agents. Sign up with Google or email at <a href="https://bronto.io/signup" target="_blank" rel="noopener">bronto.io/signup</a>.</p>
         </div>
         <div className="offer">
-          <div className="kicker">AWS</div>
-          <div className="big">Up to $200 in credits</div>
+          <div className="kicker">Your LLM</div>
+          <div className="big">AWS Bedrock, or your own key</div>
           <p>
-            New accounts get $100 on sign-up, plus $20 each for up to five getting-started activities. One of them is
-            trying a model in the <strong>Amazon Bedrock playground</strong>. The Free plan never charges you.{" "}
-            <a href="https://aws.amazon.com/free/" target="_blank" rel="noopener">aws.amazon.com/free</a>
+            Run the agents on Amazon Bedrock in your AWS account, using models that need no access form, or bring an
+            API key from OpenAI, Anthropic or Google. New to AWS? See the current offer at{" "}
+            <a href="https://aws.amazon.com/free/" target="_blank" rel="noopener">aws.amazon.com/free</a>.
           </p>
         </div>
       </section>

@@ -13,7 +13,7 @@ x-agent: &agent
     - AWS_PROFILE
     - AWS_REGION=${AWS_REGION:-us-west-2}
     - AGENT_STEP=${AGENT_STEP:-1}
-    - BEDROCK_MODEL_ID=${BEDROCK_MODEL_ID:-us.amazon.nova-2-lite-v1:0}
+    - BEDROCK_MODEL_ID=${BEDROCK_MODEL_ID:-global.amazon.nova-2-lite-v1:0}
   volumes:
     - ${HOME}/.aws:/root/.aws:ro
 

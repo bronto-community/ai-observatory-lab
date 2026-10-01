@@ -8,9 +8,9 @@ On the live evening, the Track A agent also ran on **Amazon Bedrock AgentCore Ru
 Bronto next to everyone's laptops. Only the environment changes: the code is identical.
 
 <Callout tone="warn" title="Needs the AWS Paid plan">
-AgentCore is not available on the AWS Free plan. You can
-[upgrade your account](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html) to the Paid
-plan: your credits still apply, but anything beyond them is billed.
+AgentCore isn't available on the AWS Free plan. See
+[AWS Free Tier plans](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html) for what
+upgrading to the Paid plan means for your account.
 </Callout>
 
 <Steps>
@@ -29,7 +29,9 @@ uvx --from bedrock-agentcore-starter-toolkit agentcore --help
 </Step>
 <Step n={2} title="Configure" then="it saves .bedrock_agentcore.yaml.">
 
-`direct_code_deploy` uploads the code to S3 and runs it as is. It doesn't need a container build in CodeBuild.
+`direct_code_deploy` uploads the code to S3 and runs it as is. It doesn't need a container build in CodeBuild. `-r` is
+the AWS region: use the same one as in your `.env`, in a region where
+[AgentCore is available](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agentcore-regions.html).
 
 ```bash
 uvx --from bedrock-agentcore-starter-toolkit agentcore configure -e agent.py -n storefront_assistant -r us-west-2 -rf requirements.txt --disable-otel --disable-memory --deployment-type direct_code_deploy --runtime PYTHON_3_13 --non-interactive
@@ -38,10 +40,10 @@ uvx --from bedrock-agentcore-starter-toolkit agentcore configure -e agent.py -n 
 </Step>
 <Step n={3} title="Deploy, pointing the telemetry at Bronto" then="it prints the agent ARN.">
 
-Pass these on **every** deploy: they aren't remembered.
+Pass these on **every** deploy: they aren't remembered. With a US Bronto account, use `ingestion.us.bronto.io`.
 
 ```bash
-uvx --from bedrock-agentcore-starter-toolkit agentcore deploy --env DISABLE_ADOT_OBSERVABILITY=true --env OTEL_EXPORTER_OTLP_ENDPOINT=https://ingestion.eu.bronto.io --env OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf --env "OTEL_EXPORTER_OTLP_HEADERS=x-bronto-api-key=YOUR-INGESTION-KEY" --env BEDROCK_MODEL_ID=us.amazon.nova-2-lite-v1:0 --env AGENT_STEP=3 --env ATTENDEE=agentcore
+uvx --from bedrock-agentcore-starter-toolkit agentcore deploy --env DISABLE_ADOT_OBSERVABILITY=true --env OTEL_EXPORTER_OTLP_ENDPOINT=https://ingestion.eu.bronto.io --env OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf --env "OTEL_EXPORTER_OTLP_HEADERS=x-bronto-api-key=YOUR-INGESTION-KEY" --env BEDROCK_MODEL_ID=global.amazon.nova-2-lite-v1:0 --env AGENT_STEP=3 --env ATTENDEE=agentcore
 ```
 
 </Step>

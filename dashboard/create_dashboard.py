@@ -25,7 +25,8 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-BASE_URL = os.environ.get("BRONTO_API_URL", "https://api.eu.bronto.io")
+# BRONTO_REGION=eu|us, as in your Bronto address (app.eu / app.us). BRONTO_API_URL overrides it.
+BASE_URL = os.environ.get("BRONTO_API_URL") or f"https://api.{os.environ.get('BRONTO_REGION', 'eu').strip().lower() or 'eu'}.bronto.io"
 NAME = "LLM KPIs — Storefront Assistant"
 STATE = Path(os.environ.get("DASHBOARD_STATE", Path(__file__).with_name("state.json")))
 

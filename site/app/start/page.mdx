@@ -18,8 +18,12 @@ labs follow it.
 <Steps>
 <Step n="1.1" title="A Bronto account" then="you're in the Bronto app.">
 
-Already have one? Use it. Otherwise sign up at [bronto.io/signup](https://bronto.io/signup) for a **14-day trial, no
-credit card**, with Google or email. Note your **region**, EU or US: your ingestion address depends on it.
+Already have one? Use it. Otherwise sign up at [bronto.io/signup](https://bronto.io/signup) for a **trial, no credit
+card needed**, with Google or email, in the **EU or the US**. Either works: note which one. Your browser shows it once
+you're in: `app.eu.bronto.io` or `app.us.bronto.io`.
+
+This is **your** account: Track A sends your agent's telemetry here and builds its dashboard here. (Track B's agent
+reads a shared demo org instead, with a key that's on the Track B page.)
 
 </Step>
 <Step n="1.2" title="Two Bronto API keys" then="you have both keys saved somewhere safe.">
@@ -37,25 +41,26 @@ In Bronto, go to **Settings → API Keys** ([docs](https://docs.bronto.io/Accoun
 <LLMTabs>
 <Tab label="AWS Bedrock">
 
-Amazon Bedrock, paid from your AWS credits. The labs only use models that need **no access form**: Amazon Nova 2
-Lite and OpenAI's gpt-oss-120b.
+Amazon Bedrock, billed to your AWS account: the labs use a few cents of tokens. They only use models that need
+**no access form**: Amazon Nova 2 Lite and OpenAI's gpt-oss-120b.
+
+<Callout tone="tip" title="Your AWS region">
+The commands use **us-west-2 (Oregon)**: it has every model and feature the labs touch, including AgentCore. Prefer
+one closer to you? Replace `us-west-2` in the commands and in `.env` with, for example, `us-east-1`, `eu-west-1`,
+`eu-central-1` or `ap-northeast-1`. Nova 2 Lite runs as a **global** profile (`global.amazon.nova-2-lite-v1:0`), so
+the same model ID works from any of them, though AWS may serve a request from another region. gpt-oss-120b runs in
+the region you pick.
+</Callout>
 
 <Steps>
 <Step n="2.1" title="An AWS account" then="you can sign in to the AWS console.">
 
-Already have one? Use it. Otherwise sign up at [aws.amazon.com/free](https://aws.amazon.com/free/) and choose the
-**Free plan**: **$100 in credits** straight away, and up to **$100 more** from getting-started activities. The Free
-plan never charges you: when the credits run out, it stops. Turn on MFA for the root user (console → your account
-name → **Security credentials**).
+Already have one? Use it. Otherwise sign up at [aws.amazon.com/free](https://aws.amazon.com/free/), which has the
+current offer for new accounts. Turn on MFA for the root user (console → your account name → **Security
+credentials**).
 
 </Step>
-<Step n="2.2" title="Earn $20: try a model in the Bedrock playground" then="the activity shows as complete in the Explore AWS widget.">
-
-New accounts: on **Console Home**, find the **Explore AWS** widget and open *Use a foundation model in the Amazon
-Bedrock playground*. Switch the console to **US West (Oregon)**, pick **Amazon Nova 2 Lite**, and send any prompt.
-
-</Step>
-<Step n="2.3" title="The AWS CLI v2" then="aws --version prints aws-cli/2.x.">
+<Step n="2.2" title="The AWS CLI v2" then="aws --version prints aws-cli/2.x.">
 
 <OSTabs>
 <Tab label="macOS / Linux">
@@ -89,7 +94,7 @@ aws --version
 ```
 
 </Step>
-<Step n="2.4" title="Sign the CLI in" then="your browser says you're logged in.">
+<Step n="2.3" title="Sign the CLI in" then="your browser says you're logged in.">
 
 This opens your browser, signs in with your console login, and gives the CLI short-lived credentials:
 
@@ -97,25 +102,25 @@ This opens your browser, signs in with your console login, and gives the CLI sho
 aws login --region us-west-2
 ```
 
-If `aws login` isn't recognised, update the AWS CLI (step 2.3). If your company signs you in with IAM Identity
+If `aws login` isn't recognised, update the AWS CLI (step 2.2). If your company signs you in with IAM Identity
 Center instead, use `aws sso login --profile YOUR-PROFILE` and add `--profile YOUR-PROFILE` to the `aws` commands
 below.
 
 </Step>
-<Step n="2.5" title="Check who you are" then="you see your 12-digit account ID.">
+<Step n="2.4" title="Check who you are" then="you see your 12-digit account ID.">
 
 ```bash
 aws sts get-caller-identity
 ```
 
 </Step>
-<Step n="2.6" title="Check Bedrock from the CLI" then="the model replies with a short greeting.">
+<Step n="2.5" title="Check Bedrock from the CLI" then="the model replies with a short greeting.">
 
 <OSTabs>
 <Tab label="macOS / Linux">
 
 ```bash
-aws bedrock-runtime converse --region us-west-2 --model-id us.amazon.nova-2-lite-v1:0 --messages '[{"role":"user","content":[{"text":"Say hello in five words"}]}]' --query 'output.message.content[0].text' --output text
+aws bedrock-runtime converse --region us-west-2 --model-id global.amazon.nova-2-lite-v1:0 --messages '[{"role":"user","content":[{"text":"Say hello in five words"}]}]' --query 'output.message.content[0].text' --output text
 ```
 
 </Tab>
@@ -125,7 +130,7 @@ PowerShell mangles JSON quotes passed to programs, so put the message in a file 
 
 ```powershell
 '[{"role":"user","content":[{"text":"Say hello in five words"}]}]' | Set-Content -Encoding ascii msg.json
-aws bedrock-runtime converse --region us-west-2 --model-id us.amazon.nova-2-lite-v1:0 --messages file://msg.json --query "output.message.content[0].text" --output text
+aws bedrock-runtime converse --region us-west-2 --model-id global.amazon.nova-2-lite-v1:0 --messages file://msg.json --query "output.message.content[0].text" --output text
 ```
 
 </Tab>
@@ -137,8 +142,7 @@ aws bedrock-runtime converse --region us-west-2 --model-id us.amazon.nova-2-lite
 </Tab>
 <Tab label="Your own API key">
 
-No AWS account or AWS CLI needed. Your provider bills you directly, so AWS credits don't apply; the labs use a few
-cents of tokens.
+No AWS account or AWS CLI needed. Your provider bills you directly; the labs use a few cents of tokens.
 
 <Steps>
 <Step n="2.1" title="An API key from one provider" then="you have the key saved somewhere safe.">
@@ -179,7 +183,7 @@ On Linux, if you use `sudo docker`, use `sudo -E docker` in every command so you
 <Step n="4.1" title="A folder and a .env file" then="the folder has a .env file in it.">
 
 Replace the placeholders before you paste: your **ingestion key** and your **name** (lowercase, no spaces). With a
-**US** Bronto account, change `eu` to `us` in the endpoint.
+**US** Bronto account, change `BRONTO_REGION=eu` to `BRONTO_REGION=us`.
 
 <LLMTabs>
 <Tab label="AWS Bedrock">
@@ -194,7 +198,7 @@ AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY
 AWS_SESSION_TOKEN
 AWS_REGION=us-west-2
-OTEL_EXPORTER_OTLP_ENDPOINT=https://ingestion.eu.bronto.io
+BRONTO_REGION=eu
 OTEL_EXPORTER_OTLP_HEADERS=x-bronto-api-key=YOUR-INGESTION-KEY
 ATTENDEE=yourname
 EOF
@@ -210,7 +214,7 @@ AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY
 AWS_SESSION_TOKEN
 AWS_REGION=us-west-2
-OTEL_EXPORTER_OTLP_ENDPOINT=https://ingestion.eu.bronto.io
+BRONTO_REGION=eu
 OTEL_EXPORTER_OTLP_HEADERS=x-bronto-api-key=YOUR-INGESTION-KEY
 ATTENDEE=yourname
 "@ | Set-Content -Encoding ascii .env
@@ -237,7 +241,7 @@ mkdir ai-observatory && cd ai-observatory
 cat > .env <<'EOF'
 LLM_PROVIDER=openai
 OPENAI_API_KEY=YOUR-LLM-KEY
-OTEL_EXPORTER_OTLP_ENDPOINT=https://ingestion.eu.bronto.io
+BRONTO_REGION=eu
 OTEL_EXPORTER_OTLP_HEADERS=x-bronto-api-key=YOUR-INGESTION-KEY
 ATTENDEE=yourname
 EOF
@@ -251,7 +255,7 @@ mkdir ai-observatory; cd ai-observatory
 @"
 LLM_PROVIDER=openai
 OPENAI_API_KEY=YOUR-LLM-KEY
-OTEL_EXPORTER_OTLP_ENDPOINT=https://ingestion.eu.bronto.io
+BRONTO_REGION=eu
 OTEL_EXPORTER_OTLP_HEADERS=x-bronto-api-key=YOUR-INGESTION-KEY
 ATTENDEE=yourname
 "@ | Set-Content -Encoding ascii .env

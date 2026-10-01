@@ -1,5 +1,60 @@
 import Link from "next/link";
 import { Requirements } from "@/components/Guide";
+import { SetupChooser } from "@/components/SetupChooser";
+
+const SESSIONS = [
+  {
+    href: "/intro",
+    kicker: "Talk · 25 min",
+    title: "An Evening at the AI Observatory",
+    go: "Watch the talk",
+    covers: [
+      "Two readings of one title: observability for AI, and AI for observability",
+      "An agent as a service in someone's request, and the vocabulary it needs: tokens, tool calls, prompts",
+      "The OpenTelemetry GenAI conventions, and frameworks that already emit them",
+      "What a model is good at in an incident, and what it can't see",
+    ],
+    outcomes: [
+      "A shared vocabulary for the two labs",
+      "Knowing which lab answers which question",
+    ],
+  },
+  {
+    href: "/track-a",
+    kicker: "Track A · lab · about 40 min",
+    title: "Observability for AI",
+    go: "Start Track A",
+    covers: [
+      "Run a Strands customer-assistant agent in Docker, on Amazon Bedrock or your own LLM key",
+      "Send its OpenTelemetry GenAI traces, logs and metrics to your own Bronto",
+      "Add tools (one fails on purpose), then a sub-agent, then compare two models",
+      "Build a ready-made LLM KPI dashboard",
+    ],
+    outcomes: [
+      "Find any model call, tool call and token count in a trace",
+      "Explain why input tokens grow with every tool call",
+      "Spot a failing tool, and see what the customer was told",
+      "Compare models on latency, tokens and estimated cost",
+      "Keep an LLM KPI dashboard in your Bronto account",
+    ],
+  },
+  {
+    href: "/track-b",
+    kicker: "Track B · lab · about 45 min · by Severin Neumann",
+    title: "AI for Observability",
+    go: "Start Track B",
+    covers: [
+      "Build an AI SRE in seven steps: a loop, an identity, eyes, a mouth, better instructions, another model, the code",
+      "Give it Bronto MCP to read telemetry, and GitHub to file its findings and read source code",
+      "Point it at a live incident: Storefront's checkout slows down every hour after a release",
+    ],
+    outcomes: [
+      "A working investigating agent that files a GitHub issue with its hypothesis and evidence",
+      "See how instructions and model choice change its conclusions",
+      "Know what a managed agent such as AWS DevOps Agent does for you, and what it can't see",
+    ],
+  },
+];
 
 export default function Home() {
   return (
@@ -9,14 +64,46 @@ export default function Home() {
           <div className="kicker">Self-paced · AWS + Bronto</div>
           <h1>An Evening at the AI Observatory, at your own pace</h1>
           <p className="lead">
-            Two hands-on labs from the live event. First, watch an AI agent think: every model call, tool call and
-            token as OpenTelemetry traces in Bronto. Then build an AI SRE that reads telemetry and works an incident.
+            A talk and two hands-on labs from the live event. First, watch an AI agent think: every model call, tool
+            call and token as OpenTelemetry traces in Bronto. Then build an AI SRE that reads telemetry and works an
+            incident.
           </p>
           <p>You run everything yourself: your own Bronto account, and an LLM from your AWS account or your own OpenAI, Anthropic or Google key. It costs nothing to start.</p>
-          <Link href="/start" className="cta">Start here →</Link>
+          <a href="#setup" className="cta">Choose your setup →</a>
         </div>
         <img src="/img/dino-scientist.png" alt="The Bronto dinosaur in a lab coat" className="lineart" />
       </section>
+
+      <h2>The three sessions</h2>
+      <div className="sessions">
+        {SESSIONS.map((s) => (
+          <article key={s.href} className="session">
+            <span className="kicker">{s.kicker}</span>
+            <h3>{s.title}</h3>
+            <div className="session-cols">
+              <div>
+                <h4>What it covers</h4>
+                <ul>{s.covers.map((c) => <li key={c}>{c}</li>)}</ul>
+              </div>
+              <div>
+                <h4>You come away with</h4>
+                <ul>{s.outcomes.map((o) => <li key={o}>{o}</li>)}</ul>
+              </div>
+            </div>
+            <Link href={s.href} className="go">{s.go} →</Link>
+          </article>
+        ))}
+      </div>
+
+      <h2>Choose your setup</h2>
+      <p>
+        Pick what you&rsquo;ll use. Every page then shows the commands for your choices, and the site remembers them.
+      </p>
+      <SetupChooser />
+      <p><Link href="/start" className="cta">Start the setup →</Link></p>
+
+      <h2>What you need</h2>
+      <Requirements />
 
       <section className="offers" aria-label="What you start with">
         <div className="offer">
@@ -36,31 +123,6 @@ export default function Home() {
           </p>
         </div>
       </section>
-
-      <h2>What you need</h2>
-      <Requirements />
-
-      <h2>The three sessions</h2>
-      <div className="cards">
-        <Link href="/intro" className="card">
-          <span className="kicker">25 min · talk</span>
-          <h3>An Evening at the AI Observatory</h3>
-          <p>Why AI sits on both sides of observability: agents as systems to observe, and agents as the ones doing the observing.</p>
-          <span className="go">Watch the deck →</span>
-        </Link>
-        <Link href="/track-a" className="card">
-          <span className="kicker">Track A · lab</span>
-          <h3>Observability for AI</h3>
-          <p>Run a Strands agent, on Amazon Bedrock or your own LLM key, and see its GenAI traces, tokens, tool errors and sub-agent in Bronto. Then the LLM KPI dashboard.</p>
-          <span className="go">Start Track A →</span>
-        </Link>
-        <Link href="/track-b" className="card">
-          <span className="kicker">Track B · lab</span>
-          <h3>AI for Observability</h3>
-          <p>Build your own AI SRE in seven steps: identity, Bronto MCP for eyes, GitHub for the code and the report, against a live incident.</p>
-          <span className="go">Start Track B →</span>
-        </Link>
-      </div>
 
       <h2>Everything in one place</h2>
       <ul className="resources">

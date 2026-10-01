@@ -8,8 +8,11 @@ export const metadata = { title: "Start here" };
 
 <Requirements />
 
-Everything the labs need goes into one `.env` file. Pick your LLM route below: the choice is remembered, and both
-labs follow it.
+## Your setup
+
+Everything the labs need goes into one `.env` file. Pick your setup: the commands on every page follow it.
+
+<SetupChooser />
 
 <OneAtATime />
 
@@ -191,8 +194,8 @@ On Linux, if you use `sudo docker`, use `sudo -E docker` in every command so you
 <Steps>
 <Step n="4.1" title="A folder and a .env file" then="the folder has a .env file in it.">
 
-Replace the placeholders before you paste: your **ingestion key** and your **name** (lowercase, no spaces). With a
-**US** Bronto account, change `BRONTO_REGION=eu` to `BRONTO_REGION=us`.
+Replace the placeholders before you paste: your **ingestion key** and your **name** (lowercase, no spaces).
+`BRONTO_REGION` already matches the Bronto region in your setup.
 
 <LLMTabs>
 <Tab label="AWS Bedrock">
@@ -239,8 +242,7 @@ The three bare `AWS_…` lines have no values on purpose: Docker copies them fro
 </Tab>
 <Tab label="Your own API key">
 
-Put in your LLM key too. The example is for Google Gemini. For OpenAI, use the lines `LLM_PROVIDER=openai` and
-`OPENAI_API_KEY=…`; for Anthropic, `LLM_PROVIDER=anthropic` and `ANTHROPIC_API_KEY=…`.
+Put in your LLM key too. The provider lines already match the provider in your setup.
 
 <OSTabs>
 <Tab label="macOS / Linux">

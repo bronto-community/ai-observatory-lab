@@ -2,6 +2,7 @@ import type { MDXComponents } from "mdx/types";
 import { CodeBlock } from "@/components/CodeBlock";
 import { Callout, Deck, NextPage, OneAtATime, Requirements, Step, Steps } from "@/components/Guide";
 import { LLMTabs, OSTabs, Tab } from "@/components/OSTabs";
+import { SetupChooser, SetupSummary } from "@/components/SetupChooser";
 
 const components: MDXComponents = {
   pre: CodeBlock,
@@ -14,6 +15,8 @@ const components: MDXComponents = {
   OneAtATime,
   OSTabs,
   Requirements,
+  SetupChooser,
+  SetupSummary,
   Step,
   Steps,
   Tab,

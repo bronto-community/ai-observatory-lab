@@ -168,10 +168,38 @@ th { color: var(--ink-dim); font-weight: 600; }
 .card h3 { font: 500 1.35rem "Source Serif 4", Georgia, serif; margin: 0; }
 .card p { margin: 0; font-size: 0.93rem; color: var(--ink-dim); }
 .card .go { margin-top: auto; padding-top: 0.5rem; color: var(--sapphire); font-weight: 600; font-size: 0.93rem; }
+.sessions { display: grid; gap: 1rem; margin: 1.2rem 0 2rem; }
+.session { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.1rem 1.3rem; }
+.session h3 { font: 500 1.5rem "Source Serif 4", Georgia, serif; margin: 0.2rem 0 0.6rem; }
+.session-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4rem 2rem; }
+.session h4 { margin: 0.4rem 0 0.3rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-dim); }
+.session ul { margin: 0; padding-left: 1.1rem; font-size: 0.95rem; }
+.session li { margin: 0.2rem 0; }
+.session .go { display: inline-block; margin-top: 0.7rem; color: var(--sapphire); font-weight: 700; text-decoration: none; }
+.session .go:hover { text-decoration: underline; }
+
+/* Setup chooser: radio cards, remembered across the site */
+.chooser { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 1rem 0; }
+.choice { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 0.7rem 0.9rem 0.8rem; margin: 0; min-width: 0; }
+.choice legend { padding: 0 0.3rem; font-weight: 700; font-size: 0.9rem; }
+.choice label { display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.45rem 0.55rem; border-radius: 8px; cursor: pointer; border: 1px solid transparent; }
+.choice label.on { border-color: color-mix(in srgb, var(--sapphire) 45%, var(--border)); background: var(--sapphire-soft); }
+.choice input { accent-color: var(--sapphire); margin-top: 0.25rem; width: 1rem; height: 1rem; flex: none; }
+.choice span { display: flex; flex-direction: column; }
+.choice small { color: var(--ink-dim); font-size: 0.82rem; }
+.choice:disabled { opacity: 0.5; }
+.choice:disabled label { cursor: not-allowed; }
+.chooser-note { grid-column: 1 / -1; margin: 0; font-size: 0.88rem; color: var(--ink-dim); }
+.setup-summary { font-size: 0.9rem; color: var(--ink-dim); background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.45rem 0.8rem; }
+.setup-summary strong { color: var(--ink); }
+
 .resources { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4rem 1.5rem; padding: 0; list-style: none; }
 
 @media (max-width: 760px) {
-  .hero, .offers, .cards, .resources { grid-template-columns: minmax(0, 1fr); }
+  .hero, .offers, .cards, .resources, .session-cols, .chooser { grid-template-columns: minmax(0, 1fr); }
   .hero img { max-width: 220px; }
   .code pre { padding-right: 1rem; padding-top: 2.4rem; }
 }
+
+/* Long URLs as link text wrap instead of widening the page on phones */
+main p a, main li a { overflow-wrap: anywhere; }

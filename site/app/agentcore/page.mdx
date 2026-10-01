@@ -40,7 +40,7 @@ uvx --from bedrock-agentcore-starter-toolkit agentcore configure -e agent.py -n 
 </Step>
 <Step n={3} title="Deploy, pointing the telemetry at Bronto" then="it prints the agent ARN.">
 
-Pass these on **every** deploy: they aren't remembered. With a US Bronto account, use `ingestion.us.bronto.io`.
+Pass these on **every** deploy: they aren't remembered.
 
 ```bash
 uvx --from bedrock-agentcore-starter-toolkit agentcore deploy --env DISABLE_ADOT_OBSERVABILITY=true --env OTEL_EXPORTER_OTLP_ENDPOINT=https://ingestion.eu.bronto.io --env OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf --env "OTEL_EXPORTER_OTLP_HEADERS=x-bronto-api-key=YOUR-INGESTION-KEY" --env BEDROCK_MODEL_ID=global.amazon.nova-2-lite-v1:0 --env AGENT_STEP=3 --env ATTENDEE=agentcore

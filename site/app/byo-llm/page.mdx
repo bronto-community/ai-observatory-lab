@@ -7,11 +7,14 @@ export const metadata = { title: "Use your own LLM key" };
 Both labs can call a model from OpenAI, Anthropic or Google directly instead of Amazon Bedrock: no AWS account or
 AWS CLI needed. [Start here](/start) sets it up when you pick **Your own API key**. This page is the reference.
 
+No key yet? Google Gemini's [free tier](https://ai.google.dev/gemini-api/docs/billing) covers both labs at no cost,
+within its rate limits. On the free tier, Google may use your prompts to improve its products.
+
 | Provider | `.env` lines | Default model | Get a key |
 |---|---|---|---|
+| Google (free tier) | `LLM_PROVIDER=gemini`<br/>`GEMINI_API_KEY=…` | `gemini-3.8-flash` | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) |
 | OpenAI | `LLM_PROVIDER=openai`<br/>`OPENAI_API_KEY=sk-…` | `gpt-5.4-mini` | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) |
 | Anthropic | `LLM_PROVIDER=anthropic`<br/>`ANTHROPIC_API_KEY=sk-ant-…` | `claude-haiku-4-5-20251001` | [console.anthropic.com](https://console.anthropic.com/settings/keys) |
-| Google | `LLM_PROVIDER=gemini`<br/>`GEMINI_API_KEY=…` | `gemini-3.8-flash` | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) |
 
 - **A different model** from the same provider: add `MODEL_ID=…` (for example `MODEL_ID=gpt-5.4`). In Track A, a
   request can also switch it for one question with `"model": "…"` (step 9).

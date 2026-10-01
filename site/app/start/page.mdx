@@ -142,17 +142,26 @@ aws bedrock-runtime converse --region us-west-2 --model-id global.amazon.nova-2-
 </Tab>
 <Tab label="Your own API key">
 
-No AWS account or AWS CLI needed. Your provider bills you directly; the labs use a few cents of tokens.
+No AWS account or AWS CLI needed.
+
+<Callout tone="tip" title="No key yet? Use Google Gemini's free tier">
+A Gemini API key on Google's [free tier](https://ai.google.dev/gemini-api/docs/billing) covers both labs at no
+cost, with no billing account. Two things to know: the free tier has rate limits (if you see a `429` or
+`RESOURCE_EXHAUSTED` error, wait a minute and ask again), and Google may use free-tier prompts and answers to improve
+its products, so don't send anything private. With OpenAI or Anthropic, your provider bills you; the labs use a
+few cents of tokens.
+</Callout>
 
 <Steps>
 <Step n="2.1" title="An API key from one provider" then="you have the key saved somewhere safe.">
 
+- **Google** (free tier, recommended): [aistudio.google.com/apikey](https://aistudio.google.com/apikey). Sign in
+  with a Google account and **Create API key**. The labs use `gemini-3.8-flash`.
 - **OpenAI**: [platform.openai.com/api-keys](https://platform.openai.com/api-keys). The labs use `gpt-5.4-mini`.
 - **Anthropic**: [console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys). The labs use
   `claude-haiku-4-5-20251001`.
-- **Google**: [aistudio.google.com/apikey](https://aistudio.google.com/apikey). The labs use `gemini-3.8-flash`.
 
-OpenAI and Anthropic need prepaid credit on the account before the key works. Google's free tier is enough.
+OpenAI and Anthropic need prepaid credit on the account before the key works.
 More on models: [Your own LLM key](/byo-llm).
 
 </Step>
@@ -230,8 +239,8 @@ The three bare `AWS_…` lines have no values on purpose: Docker copies them fro
 </Tab>
 <Tab label="Your own API key">
 
-Also replace the provider and key lines: `LLM_PROVIDER=openai` with `OPENAI_API_KEY=`, `LLM_PROVIDER=anthropic` with
-`ANTHROPIC_API_KEY=`, or `LLM_PROVIDER=gemini` with `GEMINI_API_KEY=`.
+Put in your LLM key too. The example is for Google Gemini. For OpenAI, use the lines `LLM_PROVIDER=openai` and
+`OPENAI_API_KEY=…`; for Anthropic, `LLM_PROVIDER=anthropic` and `ANTHROPIC_API_KEY=…`.
 
 <OSTabs>
 <Tab label="macOS / Linux">
@@ -239,8 +248,8 @@ Also replace the provider and key lines: `LLM_PROVIDER=openai` with `OPENAI_API_
 ```bash
 mkdir ai-observatory && cd ai-observatory
 cat > .env <<'EOF'
-LLM_PROVIDER=openai
-OPENAI_API_KEY=YOUR-LLM-KEY
+LLM_PROVIDER=gemini
+GEMINI_API_KEY=YOUR-LLM-KEY
 BRONTO_REGION=eu
 OTEL_EXPORTER_OTLP_HEADERS=x-bronto-api-key=YOUR-INGESTION-KEY
 ATTENDEE=yourname
@@ -253,8 +262,8 @@ EOF
 ```powershell
 mkdir ai-observatory; cd ai-observatory
 @"
-LLM_PROVIDER=openai
-OPENAI_API_KEY=YOUR-LLM-KEY
+LLM_PROVIDER=gemini
+GEMINI_API_KEY=YOUR-LLM-KEY
 BRONTO_REGION=eu
 OTEL_EXPORTER_OTLP_HEADERS=x-bronto-api-key=YOUR-INGESTION-KEY
 ATTENDEE=yourname

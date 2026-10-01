@@ -172,7 +172,8 @@ are **not** included in the parent span's total: add them up yourself.
 <Step n={10} title="Make some traffic (terminal 2)" then="20 lines of results, mixing both models.">
 
 Keep the step 3 agent running, then send 20 mixed questions. `MODELS` lists your two models from steps 8 and 9;
-on your own key, replace it, for example `MODELS=gpt-5.4-mini,gpt-5.4`:
+on your own key, replace it, for example `MODELS=gemini-3.8-flash,gemini-2.5-flash`. On Gemini's free tier,
+some answers may come back with a rate-limit error (`429`): that's the free tier, and it shows up in Bronto too.
 
 <OSTabs>
 <Tab label="macOS / Linux">

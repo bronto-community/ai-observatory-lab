@@ -29,7 +29,9 @@ export default function Home() {
           <div className="big">AWS Bedrock, or your own key</div>
           <p>
             Run the agents on Amazon Bedrock in your AWS account, using models that need no access form, or bring an
-            API key from OpenAI, Anthropic or Google. New to AWS? See the current offer at{" "}
+            API key from OpenAI, Anthropic or Google. No key yet? Google Gemini&rsquo;s{" "}
+            <a href="https://ai.google.dev/gemini-api/docs/billing" target="_blank" rel="noopener">free tier</a> covers both
+            labs. New to AWS? See the current offer at{" "}
             <a href="https://aws.amazon.com/free/" target="_blank" rel="noopener">aws.amazon.com/free</a>.
           </p>
         </div>

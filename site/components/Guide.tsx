@@ -82,7 +82,7 @@ export function Requirements() {
         <tr>
           <td>An LLM, one of</td>
           <td>
-            <strong>An AWS account</strong> for Amazon Bedrock (new or existing), <strong>or your own API key</strong> from OpenAI, Anthropic or Google.
+            <strong>An AWS account</strong> for Amazon Bedrock (new or existing), <strong>or your own API key</strong> from OpenAI, Anthropic or Google. No key? Google Gemini&rsquo;s free tier covers both labs.
           </td>
           <td className="who">A and B</td>
         </tr>

@@ -7,7 +7,8 @@
 >   and a key that can create dashboards. Track A sends everything here. Track B doesn't use it: its agent reads a
 >   shared Bronto demo org with a public read-only key the guide provides.
 > - **An LLM**: an AWS account for Amazon Bedrock (any region with the lab's models; us-west-2 by default),
->   **or** your own OpenAI, Anthropic or Google API key.
+>   **or** your own OpenAI, Anthropic or Google API key. No key? Google Gemini's
+>   [free tier](https://ai.google.dev/gemini-api/docs/billing) covers both labs.
 > - **Docker**, and the **AWS CLI v2** if you use AWS.
 > - For Track B: a **GitHub** account, an empty public repo and a fine-grained token.
 >

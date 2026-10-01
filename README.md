@@ -1,11 +1,18 @@
 # Track A: Observability for AI
 
-> **Doing this lab on your own?** Start at **[ai-observatory-lab.vercel.app](https://ai-observatory-lab.vercel.app)**:
-> the self-paced edition, with your own AWS account (Free plan credits cover it) and your own Bronto trial
-> (14 days, no credit card), Track B, and bring-your-own OpenAI / Anthropic / Google key.
+> **Doing the labs on your own?** Start at **[ai-observatory-lab.vercel.app](https://ai-observatory-lab.vercel.app)**:
+> the self-paced edition of both labs (Track A here, and Track B, Severin Neumann's AI SRE). You need:
+>
+> - **A Bronto account**: a new trial (14 days, no credit card) or your own, with an ingestion key and a key that
+>   can create dashboards. Track B reads a shared demo org with a key the guide provides.
+> - **An LLM**: an AWS account for Amazon Bedrock (the Free plan's credits cover it), **or** your own OpenAI,
+>   Anthropic or Google API key.
+> - **Docker**, and the **AWS CLI v2** if you use AWS.
+> - For Track B: a **GitHub** account, an empty public repo and a fine-grained token.
+>
 > The rest of this README is the version used on the live evening, with AWS workshop accounts.
 
-A small customer-assistant agent (Strands on Amazon Bedrock) that sends its
+A small customer-assistant agent (Strands, on Amazon Bedrock or your own LLM key) that sends its
 OpenTelemetry traces, logs and metrics to Bronto. You run it in Docker, ask
 it questions, and read what it did: model calls, tokens, tool calls, a
 failing tool, a sub-agent.

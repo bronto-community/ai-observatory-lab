@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Requirements } from "@/components/Guide";
 
 export default function Home() {
   return (
@@ -11,10 +12,10 @@ export default function Home() {
             Two hands-on labs from the live event. First, watch an AI agent think: every model call, tool call and
             token as OpenTelemetry traces in Bronto. Then build an AI SRE that reads telemetry and works an incident.
           </p>
-          <p>You run everything yourself, in your own AWS account and your own Bronto trial. It costs nothing to start.</p>
+          <p>You run everything yourself: your own Bronto account, and an LLM from your AWS account or your own OpenAI, Anthropic or Google key. It costs nothing to start.</p>
           <Link href="/start" className="cta">Start here →</Link>
         </div>
-        <img src="/img/dino-scientist.png" alt="The Bronto dinosaur in a lab coat" />
+        <img src="/img/dino-scientist.png" alt="The Bronto dinosaur in a lab coat" className="lineart" />
       </section>
 
       <section className="offers" aria-label="Free offers">
@@ -34,6 +35,9 @@ export default function Home() {
         </div>
       </section>
 
+      <h2>What you need</h2>
+      <Requirements />
+
       <h2>The three sessions</h2>
       <div className="cards">
         <Link href="/intro" className="card">
@@ -45,7 +49,7 @@ export default function Home() {
         <Link href="/track-a" className="card">
           <span className="kicker">Track A · lab</span>
           <h3>Observability for AI</h3>
-          <p>Run a Strands agent on Amazon Bedrock and see its GenAI traces, tokens, tool errors and sub-agent in Bronto. Then the LLM KPI dashboard.</p>
+          <p>Run a Strands agent, on Amazon Bedrock or your own LLM key, and see its GenAI traces, tokens, tool errors and sub-agent in Bronto. Then the LLM KPI dashboard.</p>
           <span className="go">Start Track A →</span>
         </Link>
         <Link href="/track-b" className="card">
@@ -58,12 +62,12 @@ export default function Home() {
 
       <h2>Everything in one place</h2>
       <ul className="resources">
-        <li><Link href="/start">Setup: accounts, AWS CLI, Docker, <code>.env</code></Link></li>
+        <li><Link href="/start">Setup: Bronto, your LLM, Docker, <code>.env</code></Link></li>
         <li><Link href="/byo-llm">Use your own OpenAI, Anthropic or Google key</Link></li>
         <li><a href="https://ai-observatory-talk.vercel.app" target="_blank" rel="noopener">Intro talk deck ↗</a></li>
         <li><a href="https://observability-for-ai-lab.vercel.app" target="_blank" rel="noopener">Track A deck ↗</a></li>
         <li><a href="https://aisre-lab.vercel.app" target="_blank" rel="noopener">Track B deck ↗</a></li>
-        <li><a href="https://github.com/bronto-community/track-a-observability-for-ai" target="_blank" rel="noopener">Track A code on GitHub ↗</a></li>
+        <li><a href="https://github.com/bronto-community/track-a-observability-for-ai" target="_blank" rel="noopener">Lab code on GitHub ↗</a></li>
         <li><Link href="/agentcore">Deploy to AgentCore Runtime (Paid plan)</Link></li>
         <li><Link href="/cleanup">Clean up when you&rsquo;re done</Link></li>
       </ul>

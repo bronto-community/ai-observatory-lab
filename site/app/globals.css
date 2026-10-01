@@ -6,8 +6,9 @@
   --ink-dim: #6f665a;
   --border: #e7e0d4;
   --code-bg: #f3efe8;
-  --sapphire: #476bff;
+  --sapphire: #3a5ae6; /* brand #476bff, darkened to pass WCAG AA as text */
   --sapphire-soft: #e6ebff;
+  --on-sapphire: #ffffff;
   --mint: #53dfa9;
   --mint-soft: #dbf9ee;
   --warn: #f5512e;
@@ -24,6 +25,7 @@
     --code-bg: #26221b;
     --sapphire: #8fa6ff;
     --sapphire-soft: #232a4a;
+    --on-sapphire: #17150f;
     --mint: #53dfa9;
     --mint-soft: #16332a;
     --warn: #ff8a6b;
@@ -39,6 +41,7 @@
   --code-bg: #26221b;
   --sapphire: #8fa6ff;
   --sapphire-soft: #232a4a;
+  --on-sapphire: #17150f;
   --mint-soft: #16332a;
   --warn: #ff8a6b;
   --warn-soft: #3a2019;
@@ -103,8 +106,8 @@ th { color: var(--ink-dim); font-weight: 600; }
 .steps { display: flex; flex-direction: column; gap: 1rem; margin: 1.2rem 0; }
 .step { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: 0.9rem; }
 .step-n {
-  width: 2.2rem; height: 2.2rem; border-radius: 50%; background: var(--sapphire); color: #fff;
-  display: grid; place-items: center; font: 700 1rem "Geist Mono", monospace;
+  width: 2.2rem; height: 2.2rem; border-radius: 50%; background: var(--sapphire); color: var(--on-sapphire);
+  display: grid; place-items: center; font: 700 0.85rem "Geist Mono", monospace;
 }
 .step-body { min-width: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.9rem 1.1rem; }
 .step-body > p:first-of-type { margin-top: 0; }
@@ -127,6 +130,17 @@ th { color: var(--ink-dim); font-weight: 600; }
 }
 .tab-bar button.on { color: var(--ink); background: var(--surface); border-color: var(--border); margin-bottom: -1px; }
 
+/* The LLM choice: a framed panel, so it reads as "your route" rather than an OS detail */
+.tabs-llm { border: 1px solid color-mix(in srgb, var(--sapphire) 35%, var(--border)); border-radius: var(--radius); padding: 0.2rem 1rem 0.6rem; background: var(--surface); }
+.tabs-llm > .tab-bar { margin: 0 -1rem 0.4rem; padding: 0.5rem 1rem 0; }
+.tabs-llm > .tab-bar button.on { color: var(--sapphire); }
+@media (max-width: 640px) { .reqs td:first-child { white-space: normal; } .tabs-llm { padding: 0.2rem 0.6rem 0.5rem; } .tabs-llm > .tab-bar { margin: 0 -0.6rem 0.4rem; padding: 0.4rem 0.6rem 0; } }
+
+/* Requirements */
+.reqs { width: 100%; display: table; }
+.reqs td:first-child { white-space: nowrap; font-weight: 600; }
+.reqs .who { color: var(--ink-dim); font-size: 0.85rem; white-space: nowrap; }
+
 /* Decks */
 .deck { margin: 1.5rem 0; }
 .deck-frame { position: relative; aspect-ratio: 16 / 9; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: #000; }
@@ -139,7 +153,10 @@ th { color: var(--ink-dim); font-weight: 600; }
 /* Landing */
 .hero { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 2rem; align-items: center; margin: 1.5rem 0 2rem; }
 .hero img { width: 100%; max-width: 340px; justify-self: center; }
-.cta { display: inline-block; margin-top: 0.8rem; background: var(--sapphire); color: #fff; text-decoration: none; font-weight: 700; padding: 0.7rem 1.2rem; border-radius: 10px; }
+/* Black line drawings on transparent: draw them in light ink on the dark theme. */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .lineart { filter: invert(0.9); } }
+:root[data-theme="dark"] .lineart { filter: invert(0.9); }
+.cta { display: inline-block; margin-top: 0.8rem; background: var(--sapphire); color: var(--on-sapphire); text-decoration: none; font-weight: 700; padding: 0.7rem 1.2rem; border-radius: 10px; }
 .cta:hover { filter: brightness(1.08); }
 .offers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 1.5rem 0; }
 .offer { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.1rem 1.2rem; }

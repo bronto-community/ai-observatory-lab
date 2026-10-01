@@ -8,7 +8,7 @@ others need their own API key in the environment:
   bedrock       AWS credentials     us.amazon.nova-2-lite-v1:0   (no access form)
   openai        OPENAI_API_KEY      gpt-5.4-mini
   anthropic     ANTHROPIC_API_KEY   claude-haiku-4-5-20251001
-  gemini        GEMINI_API_KEY      gemini-2.5-flash
+  gemini        GEMINI_API_KEY      gemini-3.8-flash
 
 Whichever you pick, Strands emits the same GenAI spans, so the traces and
 the dashboard work unchanged.
@@ -23,7 +23,7 @@ DEFAULTS = {
     "bedrock": "us.amazon.nova-2-lite-v1:0",
     "openai": "gpt-5.4-mini",
     "anthropic": "claude-haiku-4-5-20251001",
-    "gemini": "gemini-2.5-flash",
+    "gemini": "gemini-3.8-flash",
 }
 KEYS = {"openai": "OPENAI_API_KEY", "anthropic": "ANTHROPIC_API_KEY", "gemini": "GEMINI_API_KEY"}
 
@@ -64,22 +64,23 @@ def api_key() -> str | None:
     return key
 
 
-def model(model_id: str | None = None):
+def model(model_id: str | None = None, max_tokens: int = 1024):
     """A Strands model for the configured provider."""
     model_id = model_id or MODEL_ID
     if PROVIDER == "bedrock":
         from strands.models import BedrockModel
-        return BedrockModel(model_id=model_id, region_name=REGION, max_tokens=1024)
+        return BedrockModel(model_id=model_id, region_name=REGION, max_tokens=max_tokens)
     if PROVIDER == "openai":
         from strands.models.openai import OpenAIModel
         return OpenAIModel(client_args={"api_key": api_key()}, model_id=model_id,
-                           params={"max_completion_tokens": 1024})
+                           params={"max_completion_tokens": max_tokens})
     if PROVIDER == "anthropic":
         from strands.models.anthropic import AnthropicModel
-        return AnthropicModel(client_args={"api_key": api_key()}, model_id=model_id, max_tokens=1024)
+        return AnthropicModel(client_args={"api_key": api_key()}, model_id=model_id, max_tokens=max_tokens)
     from strands.models.gemini import GeminiModel
+    # Gemini counts its thinking against the output limit: leave room for both.
     return GeminiModel(client_args={"api_key": api_key()}, model_id=model_id,
-                       params={"max_output_tokens": 1024})
+                       params={"max_output_tokens": max_tokens * 4})
 
 
 def estimated_cost(model_id: str, tokens_in: int, tokens_out: int) -> float | None:

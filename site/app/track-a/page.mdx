@@ -4,11 +4,12 @@ export const metadata = { title: "Track A: Observability for AI" };
 
 # Observability for AI
 
-Run a small customer assistant for a kitchenware shop. It's built with Strands on Amazon Bedrock and has
-tools, one of which fails on purpose, plus a sub-agent. Then read what it did in your own Bronto: every model call,
+Run a small customer assistant for a kitchenware shop. It's built with Strands, runs on Amazon Bedrock or your own
+OpenAI, Anthropic or Google key, and has tools, one of which fails on purpose, plus a sub-agent. Then read what it did in your own Bronto: every model call,
 token and tool call, as OpenTelemetry GenAI traces.
 
-Before you start: finish [Start here](/start). The doctor should show three `ok` lines.
+Before you start: finish [Start here](/start). The doctor should end with “All good”. On the AWS route, put your
+credentials in each new terminal first (setup step 4.2).
 
 <Deck src="https://observability-for-ai-lab.vercel.app" title="Track A slides" />
 
@@ -49,7 +50,8 @@ It has no tools, so it can't really know. Does it admit that, or make something 
 <Step n={3} title="Find it in Bronto" then="you've found one trace with an invoke_agent span and a chat span.">
 
 In Bronto, open **Traces**, filter `attendee = yourname`, and open the newest trace. On the `chat` span,
-look for `gen_ai.request.model`, `gen_ai.usage.input_tokens` (about 90) and `gen_ai.response.finish_reasons`.
+look for `gen_ai.request.model` and `gen_ai.usage.input_tokens` (about 90). On the AWS route, the second `chat`
+span (from the AWS SDK) has `gen_ai.response.finish_reasons`.
 
 </Step>
 </Steps>
@@ -98,7 +100,7 @@ docker run --rm -p 8080:8080 --env-file .env -e AGENT_STEP=3 ghcr.io/bronto-comm
 ```
 
 </Step>
-<Step n={8} title="Ask with Amazon Nova 2 Lite, the default (terminal 2)" then="the stats show subagent_calls 1.">
+<Step n={8} title="Ask with your default model (terminal 2)" then="the stats show subagent_calls 1.">
 
 <OSTabs>
 <Tab label="macOS / Linux">
@@ -118,22 +120,36 @@ Invoke-RestMethod localhost:8080/invocations -Method Post -ContentType applicati
 </OSTabs>
 
 </Step>
-<Step n={9} title="Same question, OpenAI gpt-oss-120b on Bedrock (terminal 2)" then="compare the two answers and their stats.">
+<Step n={9} title="Same question, a second model (terminal 2)" then="compare the two answers and their stats.">
 
-No restart: the `model` field switches models for one request.
+No restart: the `model` field switches models for one request. Put your second model in place of `SECOND-MODEL`:
+
+<LLMTabs>
+<Tab label="AWS Bedrock">
+
+Use `openai.gpt-oss-120b-1:0`: OpenAI's open-weight model, on Bedrock.
+
+</Tab>
+<Tab label="Your own API key">
+
+A second model from your provider: `gpt-5.4` (OpenAI), `claude-sonnet-5-5` (Anthropic) or `gemini-2.5-flash`
+(Google).
+
+</Tab>
+</LLMTabs>
 
 <OSTabs>
 <Tab label="macOS / Linux">
 
 ```bash
-curl -s localhost:8080/invocations -d '{"prompt": "Do you have espresso cups? If not, what would you suggest instead?", "model": "openai.gpt-oss-120b-1:0"}'
+curl -s localhost:8080/invocations -d '{"prompt": "Do you have espresso cups? If not, what would you suggest instead?", "model": "SECOND-MODEL"}'
 ```
 
 </Tab>
 <Tab label="Windows (PowerShell)">
 
 ```powershell
-Invoke-RestMethod localhost:8080/invocations -Method Post -ContentType application/json -Body (@{prompt = "Do you have espresso cups? If not, what would you suggest instead?"; model = "openai.gpt-oss-120b-1:0"} | ConvertTo-Json)
+Invoke-RestMethod localhost:8080/invocations -Method Post -ContentType application/json -Body (@{prompt = "Do you have espresso cups? If not, what would you suggest instead?"; model = "SECOND-MODEL"} | ConvertTo-Json)
 ```
 
 </Tab>
@@ -150,7 +166,8 @@ are **not** included in the parent span's total: add them up yourself.
 <Steps>
 <Step n={10} title="Make some traffic (terminal 2)" then="20 lines of results, mixing both models.">
 
-Keep the step 3 agent running, then send 20 mixed questions:
+Keep the step 3 agent running, then send 20 mixed questions. `MODELS` lists your two models from steps 8 and 9;
+on your own key, replace it, for example `MODELS=gpt-5.4-mini,gpt-5.4`:
 
 <OSTabs>
 <Tab label="macOS / Linux">
@@ -193,11 +210,11 @@ docker run --rm -e BRONTO_API_KEY=YOUR-DASHBOARD-KEY ghcr.io/bronto-community/tr
 | Input and output tokens by model | input grows with every loop: history and tool results come along |
 | Model calls per question | the multiplier on cost and latency |
 | Tool calls and tool errors | your dependencies, seen from the agent |
-| Finish reasons | `max_tokens` means a truncated answer |
+| Finish reasons | `max_tokens` means a truncated answer (AWS route: it comes from the AWS SDK's span) |
 | Tokens by agent | what the sub-agent really costs |
 | Estimated spend | tokens × list price. An estimate: the conventions count tokens, not dollars |
 
-<Callout tone="note" title="Two instrumentations, one Bedrock call">
+<Callout tone="note" title="AWS route: two instrumentations, one Bedrock call">
 Each Bedrock call shows up as two `chat` spans: one from Strands (with time to first token) and one from the AWS
 SDK (with the finish reason). The dashboard counts the Strands one, so token totals aren't doubled.
 </Callout>

@@ -1,68 +1,33 @@
 export const metadata = { title: "Use your own LLM key" };
 
-<div className="kicker">Track A · optional</div>
+<div className="kicker">Both labs · reference</div>
 
 # Use your own OpenAI, Anthropic or Google key
 
-The Track A agent can use a model from OpenAI, Anthropic or Google directly, instead of Amazon Bedrock. Add two
-lines to your `.env`: which provider, and your API key. The traces look the same. Strands emits the same GenAI
-spans for every provider, so the Bronto views and the dashboard keep working.
+Both labs can call a model from OpenAI, Anthropic or Google directly instead of Amazon Bedrock: no AWS account or
+AWS CLI needed. [Start here](/start) sets it up when you pick **Your own API key**. This page is the reference.
 
 | Provider | `.env` lines | Default model | Get a key |
 |---|---|---|---|
 | OpenAI | `LLM_PROVIDER=openai`<br/>`OPENAI_API_KEY=sk-…` | `gpt-5.4-mini` | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) |
 | Anthropic | `LLM_PROVIDER=anthropic`<br/>`ANTHROPIC_API_KEY=sk-ant-…` | `claude-haiku-4-5-20251001` | [console.anthropic.com](https://console.anthropic.com/settings/keys) |
-| Google | `LLM_PROVIDER=gemini`<br/>`GEMINI_API_KEY=…` | `gemini-2.5-flash` | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) |
+| Google | `LLM_PROVIDER=gemini`<br/>`GEMINI_API_KEY=…` | `gemini-3.8-flash` | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) |
 
-To use a different model from that provider, add `MODEL_ID=…` (for example `MODEL_ID=gpt-5.4`). A request can also
-override it for one question with `"model": "…"`, as in Track A step 9.
-
-<Steps>
-<Step n={1} title="Add the provider and key to .env" then="your .env has the two new lines.">
-
-For example, for OpenAI:
-
-<OSTabs>
-<Tab label="macOS / Linux">
-
-```bash
-printf 'LLM_PROVIDER=openai\nOPENAI_API_KEY=YOUR-KEY\n' >> .env
-```
-
-</Tab>
-<Tab label="Windows (PowerShell)">
-
-```powershell
-"LLM_PROVIDER=openai`nOPENAI_API_KEY=YOUR-KEY" | Add-Content -Encoding ascii .env
-```
-
-</Tab>
-</OSTabs>
-
-</Step>
-<Step n={2} title="Run the doctor" then="it shows “openai API key and model: … answered” and the Bronto line as ok.">
-
-```bash
-docker run --rm --env-file .env ghcr.io/bronto-community/track-a-agent python doctor.py
-```
-
-</Step>
-<Step n={3} title="Run Track A as normal" then="the stats show your provider's model.">
-
-The steps are unchanged. To go back to Bedrock, delete the two lines (or set `LLM_PROVIDER=bedrock`).
-
-</Step>
-</Steps>
+- **A different model** from the same provider: add `MODEL_ID=…` (for example `MODEL_ID=gpt-5.4`). In Track A, a
+  request can also switch it for one question with `"model": "…"` (step 9).
+- **The traces look the same.** Strands emits the same GenAI spans for every provider, so the Bronto views and the
+  Track A dashboard keep working. Only the finish-reasons widget stays empty: on Bedrock that comes from the AWS
+  SDK's own span.
+- **Track B** runs Severin's agent code unchanged. The `track-b-agent` images add only this provider switch on top
+  of his images.
+- **Cost estimate:** the Track A stats estimate cost from list prices on file. For models without one (including
+  `gpt-5.4-mini` and `gemini-3.8-flash`), it shows `null`. The token counts are still exact.
+- **To go back to Bedrock**, delete the two lines (or set `LLM_PROVIDER=bedrock`) and follow the AWS route in
+  [Start here](/start).
 
 <Callout tone="warn" title="Keep your key out of anything you share">
-Your `.env` now holds a secret: don't commit it or paste it anywhere public. Your key is billed by the provider,
-not by AWS, so the AWS credits don't apply.
+Your `.env` holds a secret: don't commit it or paste it anywhere public. Your key is billed by the provider, not by
+AWS, so the AWS credits don't apply.
 </Callout>
 
-<Callout tone="note" title="Track B uses Bedrock only">
-Severin's AI SRE images call Amazon Bedrock, so Track B always needs your AWS credentials. Step 6 there already
-compares two Bedrock models.
-</Callout>
-
-The estimated-cost field in the stats uses list prices for the defaults above. For models without a price on file
-(including `gpt-5.4-mini`), it shows `null`: the token counts are still exact.
+<NextPage href="/start" label="back to setup" />

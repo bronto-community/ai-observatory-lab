@@ -18,21 +18,28 @@ baseline to compare against and a live incident.
 
 ## Before you start
 
-You need the `ai-observatory` folder and `.env` from [Start here](/start), and your AWS credentials in the
-terminal (setup step 11). Two extra accounts:
+You need the `ai-observatory` folder and `.env` from [Start here](/start). On the AWS route, put your credentials in
+each new terminal first (setup step 4.2). Your own Bronto account isn't used here: the agent reads Storefront's
+telemetry in the shared demo org, with a read-only key that's below.
 
-- **GitHub**: an account, and a new empty **public** repository for the agent's reports, for example
-  `ai-sre-issues`.
+Plus, for the agent's reports:
+
+- **GitHub**: an account, and a new empty **public** repository, for example `ai-sre-issues`.
 - **A GitHub token**: [create a fine-grained token](https://github.com/settings/personal-access-tokens/new),
   **Only select repositories →** your `ai-sre-issues`, permission **Issues: Read and write**. Public repositories,
   like Storefront's code, can always be read.
 
 <Steps>
-<Step n={1} title="Add Track B's settings to your .env" then="your .env has four more lines.">
+<Step n={1} title="Add Track B's settings to your .env" then="your .env has the new lines.">
 
 The Bronto key below is a **read-only** key for the shared demo org. It's meant to be public. Put in your GitHub
-username and token. The model is OpenAI's gpt-oss-120b on Bedrock: no access form, and in testing the best
-investigator of the form-free models. Its answers sometimes include its working notes: that's the model, not you.
+username and token.
+
+<LLMTabs>
+<Tab label="AWS Bedrock">
+
+The model line picks OpenAI's gpt-oss-120b on Bedrock: no access form, and in testing the best investigator of the
+form-free models. Its answers sometimes include its working notes: that's the model, not you.
 
 <OSTabs>
 <Tab label="macOS / Linux">
@@ -61,10 +68,49 @@ GITHUB_TOKEN=YOUR-GITHUB-TOKEN
 </Tab>
 </OSTabs>
 
+</Tab>
+<Tab label="Your own API key">
+
+Your `LLM_PROVIDER` and key from setup carry over, with the same default models as Track A.
+
+<OSTabs>
+<Tab label="macOS / Linux">
+
+```bash
+cat >> .env <<'EOF'
+BRONTO_API_KEY=13a79ead-d125-4f71-ab4d-c579119c7e1c.tUqIG3BTaonVJi_fdFldd8QjtfIcGzr4ZQfYJoXqXRo=
+GITHUB_REPO=YOUR-GITHUB-USER/ai-sre-issues
+GITHUB_TOKEN=YOUR-GITHUB-TOKEN
+EOF
+```
+
+</Tab>
+<Tab label="Windows (PowerShell)">
+
+```powershell
+@"
+BRONTO_API_KEY=13a79ead-d125-4f71-ab4d-c579119c7e1c.tUqIG3BTaonVJi_fdFldd8QjtfIcGzr4ZQfYJoXqXRo=
+GITHUB_REPO=YOUR-GITHUB-USER/ai-sre-issues
+GITHUB_TOKEN=YOUR-GITHUB-TOKEN
+"@ | Add-Content -Encoding ascii .env
+```
+
+</Tab>
+</OSTabs>
+
+</Tab>
+</LLMTabs>
+
 Stop the Track A agent first (**Ctrl-C**): both labs use port 8080.
 
 </Step>
 </Steps>
+
+<Callout tone="note" title="Seeing “403 Forbidden” from the error summary?">
+The read-only demo key can search, but Bronto's `get_error_summary` tool needs more than search access. That's a
+known Bronto issue. Good models fall back to searching and still find the incident; if yours gives up, ask it to use
+search and timeseries instead.
+</Callout>
 
 <OneAtATime />
 
@@ -74,7 +120,7 @@ Stop the Track A agent first (**Ctrl-C**): both labs use port 8080.
 <Step n={2} title="Start the agent (terminal 1)" then="it's listening on port 8080. Leave it running.">
 
 ```bash
-docker run --rm -p 8080:8080 --env-file .env ghcr.io/bronto-community/ai-sre-agent:step-1
+docker run --rm -p 8080:8080 --env-file .env ghcr.io/bronto-community/track-b-agent:step-1
 ```
 
 </Step>
@@ -139,14 +185,14 @@ EOF
 <Tab label="macOS / Linux">
 
 ```bash
-docker run --rm -p 8080:8080 --env-file .env -v "$PWD/my.md:/app/prompts/my.md" ghcr.io/bronto-community/ai-sre-agent:step-2
+docker run --rm -p 8080:8080 --env-file .env -v "$PWD/my.md:/app/prompts/my.md" ghcr.io/bronto-community/track-b-agent:step-2
 ```
 
 </Tab>
 <Tab label="Windows (PowerShell)">
 
 ```powershell
-docker run --rm -p 8080:8080 --env-file .env -v "${PWD}\my.md:/app/prompts/my.md" ghcr.io/bronto-community/ai-sre-agent:step-2
+docker run --rm -p 8080:8080 --env-file .env -v "${PWD}\my.md:/app/prompts/my.md" ghcr.io/bronto-community/track-b-agent:step-2
 ```
 
 </Tab>
@@ -215,15 +261,29 @@ the last 30 minutes. What is going on?"**
 ## Step 6: a different model
 
 <Steps>
-<Step n={13} title="Switch to Amazon Nova 2 Lite" then="compare the two issues: what changed with the model alone?">
+<Step n={13} title="Switch to a different model" then="compare the two issues: what changed with the model alone?">
 
-In `.env`, change the model line to:
+<LLMTabs>
+<Tab label="AWS Bedrock">
+
+In `.env`, change the model line to Amazon Nova 2 Lite:
 
 ```ini
 BEDROCK_MODEL_ID=us.amazon.nova-2-lite-v1:0
 ```
 
-**Ctrl-C**, run step 4 again, and ask the same question.
+</Tab>
+<Tab label="Your own API key">
+
+Add a line to `.env` for a second model from your provider: `MODEL_ID=gpt-5.4` (OpenAI),
+`MODEL_ID=claude-sonnet-5-5` (Anthropic) or `MODEL_ID=gemini-2.5-flash` (Google, an older generation: watch how
+much less it digs).
+
+</Tab>
+</LLMTabs>
+
+**Ctrl-C**, run step 4 again, and ask the same question. Afterwards, change the model back (or delete the
+`MODEL_ID` line) for step 7.
 
 </Step>
 </Steps>
@@ -248,7 +308,7 @@ Read the code."**
 
 ## What you built, and what's next
 
-A trigger (your curl), a loop (Strands on Bedrock), context (the prompt files), tools (Bronto and GitHub MCP), and an
+A trigger (your curl), a loop (Strands, on Bedrock or your provider), context (the prompt files), tools (Bronto and GitHub MCP), and an
 output (a GitHub issue). The managed version of all of this is
 [AWS DevOps Agent](https://docs.aws.amazon.com/devopsagent/). Having built one, you know what's inside, and what it
 can't see.

@@ -60,3 +60,48 @@ export function NextPage({ href, label }: { href: string; label: string }) {
     </p>
   );
 }
+
+// What a learner needs, shown on the landing page and at the top of /start.
+export function Requirements() {
+  return (
+    <table className="reqs">
+      <thead>
+        <tr><th>You need</th><th>What for</th><th>Labs</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>A Bronto account</td>
+          <td>
+            A new <a href="https://bronto.io/signup" target="_blank" rel="noopener">trial</a> (14 days, no credit card) or
+            one you already have, with two API keys you create: <strong>ingestion</strong> and <strong>dashboards</strong>.
+            Track B reads a shared demo org with a key we provide.
+          </td>
+          <td className="who">Track A</td>
+        </tr>
+        <tr>
+          <td>An LLM, one of</td>
+          <td>
+            <strong>An AWS account</strong> for Amazon Bedrock (new or existing; the Free plan&rsquo;s credits cover the
+            labs), <strong>or your own API key</strong> from OpenAI, Anthropic or Google.
+          </td>
+          <td className="who">A and B</td>
+        </tr>
+        <tr>
+          <td>Docker</td>
+          <td>Docker Desktop, OrbStack, Colima or Docker Engine. Every agent runs as a container.</td>
+          <td className="who">A and B</td>
+        </tr>
+        <tr>
+          <td>The AWS CLI v2</td>
+          <td>Only on the AWS route: it signs you in and hands the credentials to the container.</td>
+          <td className="who">If AWS</td>
+        </tr>
+        <tr>
+          <td>A GitHub account</td>
+          <td>An empty public repository for the agent&rsquo;s reports, and a fine-grained token for it.</td>
+          <td className="who">Track B</td>
+        </tr>
+      </tbody>
+    </table>
+  );
+}

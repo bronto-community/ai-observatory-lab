@@ -4,6 +4,7 @@ something to show. Usage: docker compose run --rm traffic  (N=20 by default)."""
 import json
 import os
 import random
+import re
 import time
 import urllib.request
 
@@ -24,6 +25,13 @@ QUESTIONS = [
     "Recommend a gift under the kitchen theme that is in stock right now.",
 ]
 
+
+
+def short(model_id: str) -> str:
+    """us.amazon.nova-2-lite-v1:0 -> nova-2-lite-v1:0; vendor IDs stay as they are."""
+    return re.sub(r"^((us|eu|apac|global)\.)?(amazon|openai|anthropic|meta)\.", "", model_id)
+
+
 for i in range(N):
     body = {"prompt": random.choice(QUESTIONS)}
     if MODELS:
@@ -32,7 +40,7 @@ for i in range(N):
     try:
         with urllib.request.urlopen(req, timeout=120) as r:
             s = json.load(r)["stats"]
-        print(f"{i + 1:>3}/{N}  {s['gen_ai.request.model'].split('.')[-1][:28]:<28} "
+        print(f"{i + 1:>3}/{N}  {short(s['gen_ai.request.model'])[:28]:<28} "
               f"{s['latency_ms']:>6} ms  {s['gen_ai.usage.input_tokens']:>5} in  "
               f"{s['gen_ai.usage.output_tokens']:>4} out  tools={s['tool_calls']} errors={s['tool_errors']}", flush=True)
     except Exception as e:

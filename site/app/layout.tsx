@@ -6,7 +6,6 @@ export const metadata: Metadata = {
   title: { default: "AI Observatory", template: "%s · AI Observatory" },
   description:
     "Self-paced labs from the AWS + Bronto evening: observe an AI agent with OpenTelemetry, then build an AI SRE that reads your telemetry.",
-  icons: { icon: "/img/bronto-dino.png" },
 };
 
 const NAV = [

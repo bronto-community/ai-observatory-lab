@@ -783,10 +783,11 @@ layout: center
 ---
 
 <div class="hand">
-  <div class="kicker">After food · Track B</div>
+  <div class="kicker">Next · Track B</div>
   <h1 class="hand-head">Your agent now produces evidence about itself.</h1>
   <div class="hand-sub">Next, Severin builds an agent that consumes evidence about your system: an AI SRE on AgentCore, reading Bronto.</div>
   <div class="hand-sub small">Same runtime, opposite direction.</div>
+  <a class="next-link" href="https://ai-observatory-lab.vercel.app/track-b" target="_top">Continue to Track B: build your own AI SRE →</a>
 </div>
 
 <img src="/img/bronto-dino.png" class="abs-br mr-12 mb-10 hand-dino" />
@@ -801,6 +802,10 @@ layout: center
 .hand-sub { font-size: 1.2rem; color: var(--ink-dim); line-height: 1.45; }
 .hand-sub.small { margin-top: 0.8rem; font-size: 1rem; font-style: italic; }
 .hand-dino { width: 110px; }
+.next-link {
+  display: inline-block; margin-top: 1.8rem; padding: 0.6rem 1.1rem; border-radius: 10px;
+  background: var(--sapphire); color: #fff !important; font-weight: 700; text-decoration: none !important;
+}
 </style>
 
 <!--

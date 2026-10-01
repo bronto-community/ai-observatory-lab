@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render ../README.md as the /lab page of the slides site.
+"""Render ../docs/live-evening.md as the /lab page of the slides site.
 
     uvx --from markdown python build-lab-page.py <output-dir>
 
@@ -7,17 +7,20 @@ Writes <output-dir>/lab/index.html. Relative links in the README (files in
 the repo) are pointed at the public GitHub repo so they work from the site.
 """
 
+import posixpath
 import re
 import sys
 from pathlib import Path
 
 import markdown
 
-REPO = "https://github.com/bronto-community/track-a-observability-for-ai"
+REPO = "https://github.com/bronto-community/ai-observatory-lab"
 HERE = Path(__file__).resolve().parent
 
-md = (HERE.parent / "README.md").read_text()
-md = re.sub(r"\]\((?!https?://|#)([^)]+)\)", lambda m: f"]({REPO}/blob/main/{m.group(1)})", md)
+md = (HERE.parent / "docs" / "live-evening.md").read_text()
+# Links are relative to docs/: point them at the same files on GitHub.
+md = re.sub(r"\]\((?!https?://|#)([^)]+)\)",
+            lambda m: f"]({REPO}/blob/main/{posixpath.normpath('docs/' + m.group(1))})", md)
 body = markdown.markdown(md, extensions=["fenced_code", "tables", "sane_lists", "toc"])
 
 page = f"""<!doctype html>

@@ -131,7 +131,7 @@ export default function Home() {
         <li><a href="https://ai-observatory-talk.vercel.app" target="_blank" rel="noopener">Intro talk deck ↗</a></li>
         <li><a href="https://observability-for-ai-lab.vercel.app" target="_blank" rel="noopener">Track A deck ↗</a></li>
         <li><a href="https://aisre-lab.vercel.app" target="_blank" rel="noopener">Track B deck ↗</a></li>
-        <li><a href="https://github.com/bronto-community/track-a-observability-for-ai" target="_blank" rel="noopener">Lab code on GitHub ↗</a></li>
+        <li><a href="https://github.com/bronto-community/ai-observatory-lab" target="_blank" rel="noopener">Lab code on GitHub ↗</a></li>
         <li><Link href="/agentcore">Deploy to AgentCore Runtime (Paid plan)</Link></li>
         <li><Link href="/cleanup">Clean up when you&rsquo;re done</Link></li>
       </ul>

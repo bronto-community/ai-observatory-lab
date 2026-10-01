@@ -756,7 +756,7 @@ layout: center
     </div>
     <div class="qrs">
       <QrCode url="https://observability-for-ai-lab.vercel.app/lab" :size="120" caption="lab guide" />
-      <QrCode url="https://github.com/bronto-community/track-a-observability-for-ai" :size="120" caption="the code" />
+      <QrCode url="https://github.com/bronto-community/ai-observatory-lab" :size="120" caption="the code" />
       <QrCode url="https://bronto.io/signup" :size="120" caption="bronto.io/signup" />
     </div>
   </div>
@@ -775,7 +775,7 @@ layout: center
 </style>
 
 <!--
-Lab guide (the README, all platforms): observability-for-ai-lab.vercel.app/lab. Code: github.com/bronto-community/track-a-observability-for-ai.
+Lab guide (the README, all platforms): observability-for-ai-lab.vercel.app/lab. Code: github.com/bronto-community/ai-observatory-lab.
 -->
 
 ---

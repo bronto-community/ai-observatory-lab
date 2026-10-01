@@ -1,5 +1,5 @@
 {
-  "name": "track-a-observability-for-ai",
+  "name": "ai-observatory-lab",
   "type": "module",
   "private": true,
   "scripts": {

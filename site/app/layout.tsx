@@ -46,7 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             From the AWS + Bronto evening, &ldquo;An Evening at the AI Observatory&rdquo;.
           </span>
           <span>
-            <a href="https://github.com/bronto-community/track-a-observability-for-ai" target="_blank" rel="noopener">Source on GitHub</a>
+            <a href="https://github.com/bronto-community/ai-observatory-lab" target="_blank" rel="noopener">Source on GitHub</a>
             {" · "}
             <Link href="/agentcore">AgentCore (Paid plan)</Link>
             {" · "}

@@ -10,7 +10,7 @@ colorSchema: light
 transition: slide-left
 mdc: true
 class: text-left
-favicon: /img/bronto-dino.png
+favicon: /favicon.ico
 fonts:
   sans: Radio Canada Big
   serif: Source Serif 4

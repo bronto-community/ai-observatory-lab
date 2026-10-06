@@ -30,7 +30,7 @@ page = f"""<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Track A lab guide</title>
 <meta name="description" content="Run the Observability for AI lab on macOS, Linux or Windows, in the workshop account or your own.">
-<link rel="icon" href="/img/bronto-dino.png">
+<link rel="icon" href="/favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Radio+Canada+Big:wght@400;600;700&family=Source+Serif+4:wght@500&family=Geist+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>

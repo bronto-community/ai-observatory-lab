@@ -7,3 +7,5 @@ workshop
 .env
 .git
 **/__pycache__
+mongodb-dublin/slides
+mongodb-dublin/harness

@@ -54,6 +54,22 @@ const SESSIONS = [
       "Know what a managed agent such as AWS DevOps Agent does for you, and what it can't see",
     ],
   },
+  {
+    href: "/dublin",
+    kicker: "MongoDB Dublin · talk + guided build · about 95 min",
+    title: "AI observability, from the model call to the database",
+    go: "Start the Dublin lab",
+    covers: [
+      "Trace an AI agent's model, agent and tool activity into your own Bronto",
+      "Connect Storefront's traces with MongoDB Atlas metrics and slow-query logs (Atlas OTel Metrics Sink)",
+      "Build an AI SRE in six steps and point it at a live, database-rooted incident",
+    ],
+    outcomes: [
+      "An agent whose every model and tool call you can see",
+      "A GitHub issue naming the slow query, and the commit that caused it",
+      "Know how database signals change what an agent can conclude",
+    ],
+  },
 ];
 
 export default function Home() {
@@ -74,7 +90,7 @@ export default function Home() {
         <img src="/img/dino-scientist.png" alt="The Bronto dinosaur in a lab coat" className="lineart" />
       </section>
 
-      <h2>The three sessions</h2>
+      <h2>The sessions</h2>
       <div className="sessions">
         {SESSIONS.map((s) => (
           <article key={s.href} className="session">
@@ -131,6 +147,7 @@ export default function Home() {
         <li><a href="https://ai-observatory-talk.vercel.app" target="_blank" rel="noopener">Intro talk deck ↗</a></li>
         <li><a href="https://observability-for-ai-lab.vercel.app" target="_blank" rel="noopener">Track A deck ↗</a></li>
         <li><a href="https://aisre-lab.vercel.app" target="_blank" rel="noopener">Track B deck ↗</a></li>
+        <li><a href="https://ai-observability-dublin.vercel.app" target="_blank" rel="noopener">MongoDB Dublin deck ↗</a></li>
         <li><a href="https://github.com/bronto-community/ai-observatory-lab" target="_blank" rel="noopener">Lab code on GitHub ↗</a></li>
         <li><Link href="/agentcore">Deploy to AgentCore Runtime (Paid plan)</Link></li>
         <li><Link href="/cleanup">Clean up when you&rsquo;re done</Link></li>

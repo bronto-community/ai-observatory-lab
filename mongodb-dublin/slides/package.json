@@ -1,0 +1,25 @@
+{
+  "name": "ai-observability-dublin",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "slidev --open",
+    "build": "slidev build",
+    "export": "slidev export"
+  },
+  "dependencies": {
+    "@iconify-json/lucide": "^1.2.120",
+    "@slidev/cli": "^52.18.0",
+    "@slidev/theme-default": "latest",
+    "@slidev/theme-seriph": "latest",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
+    "lucide-vue-next": "^1.0.0",
+    "qrcode-generator": "^2.0.4",
+    "roughjs": "^4.6.6",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "playwright-chromium": "^1.63.0"
+  }
+}

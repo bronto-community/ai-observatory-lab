@@ -1,0 +1,61 @@
+# Storefront on MongoDB Atlas, its load, and a Collector that forwards its telemetry to Bronto.
+# Atlas sends its metrics to Bronto directly; its mongod logs come in through Caddy + the Collector.
+# The four services build from ../storefront at whatever commit `make` checked out.
+x-service: &service
+  build: ../storefront
+  restart: unless-stopped
+  env_file: .env
+  environment: &service-env
+    OTEL_EXPORTER_OTLP_ENDPOINT: http://collector:4317
+    OTEL_EXPORTER_OTLP_INSECURE: "true"
+    GIT_REPO: https://github.com/bronto-community/storefront-mongo
+    GIT_COMMIT: ${GIT_COMMIT:-unknown}
+    SERVICE_VERSION: ${SERVICE_VERSION:-unknown}
+  depends_on: [collector]
+
+services:
+  web:
+    <<: *service
+    environment: { <<: *service-env, SERVICE_MODULE: services.web.app, SERVICE_NAME: storefront-web }
+  catalog:
+    <<: *service
+    environment: { <<: *service-env, SERVICE_MODULE: services.catalog.app, SERVICE_NAME: catalog-api }
+  checkout:
+    <<: *service
+    environment: { <<: *service-env, SERVICE_MODULE: services.checkout.app, SERVICE_NAME: checkout-api }
+  payments:
+    <<: *service
+    environment: { <<: *service-env, SERVICE_MODULE: services.payments.app, SERVICE_NAME: payments-gateway }
+
+  # The external PSP: not ours, not instrumented. Answers in ~80 ms.
+  psp:
+    image: python:3.12-slim
+    restart: unless-stopped
+    volumes: [./psp.py:/psp.py:ro]
+    command: sh -c "pip install -q fastapi==0.120.4 uvicorn==0.38.0 && uvicorn --app-dir / psp:app --host 0.0.0.0 --port 8000"
+
+  loadgen:
+    image: python:3.12-slim
+    restart: unless-stopped
+    env_file: .env
+    volumes: [./loadgen.py:/loadgen.py:ro]
+    command: sh -c "pip install -q httpx==0.28.1 && python /loadgen.py"
+    depends_on: [web]
+
+  collector:
+    image: otel/opentelemetry-collector-contrib:0.137.0
+    restart: unless-stopped
+    env_file: .env
+    volumes: [./collector.yaml:/etc/otelcol-contrib/config.yaml:ro]
+
+  # HTTPS for Atlas's log export, in front of the Collector's relay receiver.
+  caddy:
+    image: caddy:2.10
+    restart: unless-stopped
+    env_file: .env
+    ports: ["443:443"]
+    volumes: [./Caddyfile:/etc/caddy/Caddyfile:ro, caddy-data:/data]
+    depends_on: [collector]
+
+volumes:
+  caddy-data:

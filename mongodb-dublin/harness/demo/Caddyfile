@@ -1,0 +1,24 @@
+# HTTPS for the Atlas log export relay. The certificate comes from Let's
+# Encrypt for <elastic-ip>.sslip.io over the TLS-ALPN challenge, so only port
+# 443 is open. Requests without the relay token never reach the Collector.
+{$PUBLIC_HOST} {
+	tls {
+		issuer acme {
+			disable_http_challenge
+		}
+	}
+	log {
+		output stdout
+		format filter {
+			wrap json
+			fields {
+				request>headers>X-Relay-Token delete
+			}
+		}
+	}
+	@relay header X-Relay-Token {$RELAY_TOKEN}
+	handle @relay {
+		reverse_proxy collector:4318
+	}
+	respond 401
+}

@@ -1,0 +1,273 @@
+export const metadata = { title: "MongoDB Dublin: build your own AI SRE" };
+
+<div className="kicker">MongoDB Dublin · Dublin AI Week · guided build · about 75 minutes</div>
+
+# AI observability, from the model call to the database
+
+Build an AI SRE in six steps, and watch it work while you build it. It runs on your laptop, sends its own traces to
+**your** Bronto, and investigates a live incident on **Storefront**, a small shop whose orders live in **MongoDB
+Atlas**. Storefront's traces and its Atlas cluster's metrics and slow-query logs all stream into a shared Bronto demo
+org.
+
+<Deck src="https://ai-observability-dublin.vercel.app" title="Slides" />
+
+<Callout tone="note" title="Two Bronto orgs">
+**Yours** receives your agent's traces (step 2): sign up before the event at [bronto.io/signup](https://bronto.io/signup),
+EU or US, and create an **ingestion** key. **The shared demo org** holds Storefront and its Atlas cluster. Your agent
+reads it with the public **read-only** key in step 3; you never log in to it. No account on the night? Ask for a
+workshop ingestion key card.
+</Callout>
+
+## Before you start
+
+- **Docker**, running.
+- **An LLM key.** The default is Google Gemini's free tier: create a key at
+  [aistudio.google.com/apikey](https://aistudio.google.com/apikey). OpenAI, Anthropic or Amazon Bedrock work too:
+  see [your own LLM key](/byo-llm).
+- **Your Bronto account** and an **ingestion** key (Settings → API Keys).
+- **GitHub:** an account, a new empty **public** repository called `ai-sre-issues`, and a
+  [fine-grained token](https://github.com/settings/personal-access-tokens/new) for **only** that repository, with
+  **Issues: Read and write**.
+
+<OneAtATime />
+
+<Steps>
+<Step n={1} title="Pull the image and make a folder" then="you're in an empty mongodb-lab folder.">
+
+```bash
+docker pull ghcr.io/bronto-community/mongodb-lab-agent
+mkdir mongodb-lab && cd mongodb-lab
+```
+
+</Step>
+<Step n={2} title="Create .env with your LLM key" then="the folder has a .env file.">
+
+<OSTabs>
+<Tab label="macOS / Linux">
+
+```bash
+cat > .env <<'EOF'
+GEMINI_API_KEY=YOUR-GEMINI-KEY
+EOF
+```
+
+</Tab>
+<Tab label="Windows (PowerShell)">
+
+```powershell
+"GEMINI_API_KEY=YOUR-GEMINI-KEY" | Set-Content -Encoding ascii .env
+```
+
+</Tab>
+</OSTabs>
+
+Another provider? Use `LLM_PROVIDER=openai` with `OPENAI_API_KEY`, `LLM_PROVIDER=anthropic` with `ANTHROPIC_API_KEY`,
+or `LLM_PROVIDER=bedrock` with your AWS credentials and `AWS_REGION`.
+
+</Step>
+<Step n={3} title="Write your own rules into my.md" then="the folder has a my.md file.">
+
+<OSTabs>
+<Tab label="macOS / Linux">
+
+```bash
+cat > my.md <<'EOF'
+- Answer in at most three bullet points.
+- End every answer with your confidence: low, medium or high.
+- Sign off as "your friendly on-call dino".
+EOF
+```
+
+</Tab>
+<Tab label="Windows (PowerShell)">
+
+```powershell
+@"
+- Answer in at most three bullet points.
+- End every answer with your confidence: low, medium or high.
+- Sign off as "your friendly on-call dino".
+"@ | Set-Content -Encoding ascii my.md
+```
+
+</Tab>
+</OSTabs>
+
+</Step>
+</Steps>
+
+## Step 1: the loop and an identity
+
+<Steps>
+<Step n={4} title="Start the agent (terminal 1)" then="it's listening on port 8080. Leave it running.">
+
+<OSTabs>
+<Tab label="macOS / Linux">
+
+```bash
+docker run --rm -p 8080:8080 --env-file .env -v "$PWD/my.md:/app/prompts/my.md" -e AGENT_STEP=1 ghcr.io/bronto-community/mongodb-lab-agent
+```
+
+</Tab>
+<Tab label="Windows (PowerShell)">
+
+```powershell
+docker run --rm -p 8080:8080 --env-file .env -v "${PWD}\my.md:/app/prompts/my.md" -e AGENT_STEP=1 ghcr.io/bronto-community/mongodb-lab-agent
+```
+
+</Tab>
+</OSTabs>
+
+Every later step is this command with a different `AGENT_STEP`: **Ctrl-C**, change the number, run it again.
+
+</Step>
+<Step n={5} title="Ask it something (terminal 2)" then="it answers, following your rules.">
+
+<OSTabs>
+<Tab label="macOS / Linux">
+
+```bash
+curl -s localhost:8080/invocations -d '{"prompt": "Who are you?"}'
+```
+
+</Tab>
+<Tab label="Windows (PowerShell)">
+
+```powershell
+Invoke-RestMethod localhost:8080/invocations -Method Post -ContentType application/json -Body (@{prompt = "Who are you?"} | ConvertTo-Json)
+```
+
+</Tab>
+</OSTabs>
+
+Then ask **"Checkout is slow. What is wrong?"** It has no tools yet: it should say it can't see anything.
+
+</Step>
+</Steps>
+
+## Step 2: trace it into your Bronto
+
+<Steps>
+<Step n={6} title="Add your Bronto ingestion key to .env" then="your .env has three more lines.">
+
+`BRONTO_REGION` is `us` if your Bronto address is `app.us.bronto.io`. `ATTENDEE` is how you find your own traces:
+lowercase, no spaces.
+
+<OSTabs>
+<Tab label="macOS / Linux">
+
+```bash
+cat >> .env <<'EOF'
+OTEL_EXPORTER_OTLP_HEADERS=x-bronto-api-key=YOUR-INGESTION-KEY
+BRONTO_REGION=eu
+ATTENDEE=yourname
+EOF
+```
+
+</Tab>
+<Tab label="Windows (PowerShell)">
+
+```powershell
+@"
+OTEL_EXPORTER_OTLP_HEADERS=x-bronto-api-key=YOUR-INGESTION-KEY
+BRONTO_REGION=eu
+ATTENDEE=yourname
+"@ | Add-Content -Encoding ascii .env
+```
+
+</Tab>
+</OSTabs>
+
+</Step>
+<Step n={7} title="Restart with AGENT_STEP=2 and ask again" then="a trace for the ai-sre service appears in your Bronto.">
+
+In Bronto, search the `ai-sre` service and open the newest trace: `invoke_agent` → `execute_event_loop_cycle` →
+`chat`. The model, and the input and output tokens, are on the `chat` span. Keep this tab open: every later step adds
+spans.
+
+</Step>
+</Steps>
+
+## Step 3: eyes (Bronto MCP)
+
+<Steps>
+<Step n={8} title="Add the shared demo org's read-only key" then="your .env has a BRONTO_API_KEY line.">
+
+This key is **read-only** and meant to be public. It's for the shared org where Storefront runs, not your account.
+
+```ini
+BRONTO_API_KEY=13a79ead-d125-4f71-ab4d-c579119c7e1c.tUqIG3BTaonVJi_fdFldd8QjtfIcGzr4ZQfYJoXqXRo=
+```
+
+</Step>
+<Step n={9} title="Restart with AGENT_STEP=3, then ask" then="it lists Storefront's services and finds something in checkout.">
+
+First **"What services do you know about?"**, then **"Anything wrong with checkout?"** Look at the trace in your Bronto:
+how many MCP tool calls did it make, and how many tokens did it use?
+
+</Step>
+</Steps>
+
+## Step 4: the database
+
+Bronto's MCP server reads logs and traces, not metrics. Step 4 gives the agent two tools that call Bronto's metrics API
+for the Atlas cluster's metrics, plus a few rules on how to investigate.
+
+<Steps>
+<Step n={10} title="Teach it how you investigate" then="my.md has four more rules.">
+
+Add to the end of `my.md`:
+
+```md
+- Slow is broken too: compare latency (p50, p95) before and after, not only errors.
+- Compare against a quiet window earlier the same evening.
+- When a request is slow, look at its child spans: is the time in the database?
+- Then check the database's side: Atlas metrics (query targeting, operation latency) and slow-query logs.
+```
+
+</Step>
+<Step n={11} title="Restart with AGENT_STEP=4 and ask" then="does it tie the slow checkout to the database, and say why?">
+
+Ask: **"Customers say checkout got slow tonight. Is it the database?"** Look for the slow `mongodb` span, Atlas's
+query targeting, and a `COLLSCAN` slow-query line.
+
+</Step>
+</Steps>
+
+## Step 5: a mouth (a GitHub issue)
+
+<Steps>
+<Step n={12} title="Add your GitHub repo and token to .env" then="your .env has GITHUB_REPO and GITHUB_TOKEN.">
+
+```ini
+GITHUB_REPO=YOUR-GITHUB-USER/ai-sre-issues
+GITHUB_TOKEN=YOUR-GITHUB-TOKEN
+```
+
+</Step>
+<Step n={13} title="Restart with AGENT_STEP=5 and ask again" then="the answer is a link to a new issue in your ai-sre-issues repo.">
+
+Read the hypothesis: is it right? How confident is it? What does it say it couldn't check?
+
+</Step>
+</Steps>
+
+## Step 6: the code
+
+<Steps>
+<Step n={14} title="Restart with AGENT_STEP=6 and ask" then="does it find the release and pick the right commit?">
+
+The agent can now read Storefront's source on GitHub (`bronto-community/storefront-mongo`), and every service reports
+the commit it runs. Ask: **"Customers say checkout got slow tonight. What is going on?"** The release has three
+commits, and two of them are decoys. If it stops at the deploy, ask: **"Which change in that release caused it? Read
+the code."**
+
+</Step>
+</Steps>
+
+## What you built
+
+A trigger (your curl), a loop (Strands, on Gemini or your provider), an identity (the prompt files), eyes (Bronto MCP
+plus a metrics tool), a mouth (a GitHub issue) and the code (GitHub MCP), with its own traces in your Bronto. The
+database signals in step 4 are what let it go past "something in checkout".
+
+<NextPage href="/byo-llm" label="try another model" />

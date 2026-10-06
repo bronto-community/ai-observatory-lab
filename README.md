@@ -10,6 +10,7 @@ run on your own. The guide is the website, and this repository is everything beh
 | [Intro talk](https://ai-observatory-lab.vercel.app/intro) · 25 min | Observability for AI and AI for observability; the OpenTelemetry GenAI conventions | A shared vocabulary for the two labs |
 | [Track A: Observability for AI](https://ai-observatory-lab.vercel.app/track-a) · about 40 min | Run a Strands agent in Docker and read its GenAI traces in Bronto: tokens, tool calls, a failing tool, a sub-agent, two models | An LLM KPI dashboard in your own Bronto, and knowing where to look in a trace |
 | [Track B: AI for Observability](https://ai-observatory-lab.vercel.app/track-b) · about 45 min, by Severin Neumann | Build an AI SRE in seven steps, with Bronto MCP and GitHub, against a live incident | An agent that files a GitHub issue with its hypothesis and evidence |
+| [MongoDB Dublin: AI observability, from the model call to the database](https://ai-observatory-lab.vercel.app/dublin) · 20 min talk + 75 min build | Trace an AI SRE into your own Bronto, connect Storefront's traces with MongoDB Atlas metrics and slow-query logs, and find a database-rooted incident's cause | An agent that names the slow query and the commit behind it ([`mongodb-dublin/`](mongodb-dublin/)) |
 
 ## What you need
 
@@ -70,6 +71,7 @@ The full guide, with the AWS route, Windows commands and every step, is on the
 | [`slides/`](slides) | The Track A deck (Slidev), published at [observability-for-ai-lab.vercel.app](https://observability-for-ai-lab.vercel.app) |
 | [`iam/least-privilege.json`](iam/least-privilege.json) | An IAM policy for running Track A in your own AWS account |
 | [`docs/live-evening.md`](docs/live-evening.md) | Track A as it ran on the night, with AWS workshop accounts |
+| [`mongodb-dublin/`](mongodb-dublin) | The MongoDB Dublin talk and lab: its deck, its own AI SRE agent (`ghcr.io/bronto-community/mongodb-lab-agent`), the Mongo-backed Storefront and its incident harness |
 
 The other two decks are Severin Neumann's:
 [intro talk](https://ai-observatory-talk.vercel.app) and [Track B](https://aisre-lab.vercel.app).

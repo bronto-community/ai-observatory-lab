@@ -1,0 +1,9 @@
+fastapi==0.120.4
+uvicorn[standard]==0.38.0
+httpx==0.28.1
+pymongo==4.15.3
+opentelemetry-sdk==1.44.0
+opentelemetry-exporter-otlp-proto-grpc==1.44.0
+opentelemetry-instrumentation-fastapi==0.65b0
+opentelemetry-instrumentation-httpx==0.65b0
+opentelemetry-instrumentation-pymongo==0.65b0

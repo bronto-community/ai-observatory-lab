@@ -1,0 +1,167 @@
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&display=swap');
+
+/* ── Bronto brand theme (bronto.io look & feel) ──────────────────────────────
+   Light, warm-cream background · Source Serif display headers · Radio Canada Big
+   body · Electric Sapphire / Tropical Mint / Lemon Lime accents.
+   Tweak brand values here; everything downstream reads these vars.            */
+
+:root {
+  /* Surfaces */
+  --bg:            #FAF8F4;   /* warm cream (hsl 40 33% 98%)  */
+  --surface:       #FFFFFF;   /* cards / panels               */
+  --cream:         #FFEAD7;   /* Antique White                */
+  --ink:           #2B2620;   /* warm near-black text         */
+  --ink-dim:       #857B6E;   /* muted text                   */
+  --border:        #E7E0D4;   /* hairline borders             */
+
+  /* Brand palette */
+  --sapphire:      #476BFF;   /* Electric Sapphire (primary)  */
+  --sapphire-soft: #C2CEFF;
+  --sapphire-dark: #0129CC;
+  --mint:          #53DFA9;   /* Tropical Mint                */
+  --mint-soft:     #DBF9EE;
+  --lime:          #CDE519;   /* Lemon Lime                   */
+
+  /* Semantic aliases used by components */
+  --accent:        var(--sapphire);
+  --panel:         var(--surface);
+  --panel-border:  var(--border);
+  --claim:         #F5512E;   /* attention hue for the "AI SRE hype" corner */
+}
+
+/* Page canvas */
+.slidev-layout {
+  background: var(--bg);
+  color: var(--ink);
+  --slidev-code-font-size: 0.85em;
+}
+
+/* Serif display for the big headers (H1/H2); Radio Canada Big for the rest */
+.slidev-layout h1,
+.slidev-layout h2,
+.font-serif {
+  font-family: 'Source Serif 4', 'Source Serif Pro', Georgia, serif;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  line-height: 1.08;
+}
+.slidev-layout h3,
+.slidev-layout h4 { color: var(--ink); letter-spacing: -0.01em; }
+
+/* Cover / section / statement slides also get the cream canvas */
+.slidev-layout.cover,
+.slidev-layout.section,
+.slidev-layout.statement,
+.slidev-layout.center,
+.slidev-layout.full { background: var(--bg); }
+
+/* Long content never overflows the beamer: it scrolls inside its box. */
+.fit-scroll { max-height: 78vh; overflow: auto; }
+
+.draft-note { font-size: 1.25rem; line-height: 1.4; color: var(--ink-dim); font-style: italic; }
+
+/* "what this chapter covers" list, used inside SectionCard */
+.sc-list { display: flex; flex-direction: column; gap: 0.55rem; }
+.sc-list span {
+  position: relative; padding-left: 1.1rem;
+  font-size: 1.15rem; color: var(--ink-dim);
+}
+.sc-list span::before {
+  content: ''; position: absolute; left: 0; top: 0.55em;
+  width: 7px; height: 7px; border-radius: 50%; background: var(--mint);
+}
+
+.font-hand { font-family: 'Kalam', cursive; }
+
+/* Pill tag (bronto.io hero style) */
+.pill {
+  display: inline-flex; align-items: center; gap: 0.35em;
+  padding: 0.15em 0.7em; border-radius: 999px;
+  font-size: 0.8em; font-weight: 600;
+}
+
+/* Image links (the logo on the title slide) shouldn't get the theme's dashed
+   underline. Needs to out-specify `.slidev-layout a`. */
+.slidev-layout a.brand-logo-link {
+  border-bottom: none;
+  text-decoration: none;
+}
+
+/* Spelled-out URLs on the closing slides. The theme's dashed border-bottom on
+   every <a> reads as damage on a monospace URL, so out-specify it. */
+.slidev-layout a.tl-url,
+.slidev-layout a.wp-url {
+  font-family: 'Geist Mono', monospace;
+  color: var(--sapphire);
+  border-bottom: 1px solid color-mix(in srgb, var(--sapphire) 40%, transparent);
+  text-decoration: none;
+  transition: border-color 0.15s ease;
+}
+.slidev-layout a.tl-url:hover,
+.slidev-layout a.wp-url:hover { border-bottom-color: var(--sapphire); }
+.slidev-layout a.tl-url { font-size: 1.05rem; }
+
+/* Small Bronto wordmark used in slide corners */
+.brand-mark {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-weight: 600; color: var(--ink); opacity: 0.7;
+}
+
+kbd {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 5px; padding: 1px 6px; font-size: 0.85em;
+}
+
+/* Code never widens a column: it wraps inside it. */
+.slidev-layout pre, .slidev-layout pre code, .slidev-layout .line {
+  white-space: pre-wrap; overflow-wrap: anywhere;
+}
+
+/* "leave this running" hint under a long-running docker command */
+.keep { font-size: 0.72rem; color: var(--ink-dim); margin: 0.25rem 0 0.1rem; }
+.keep b { color: var(--claim); }
+
+/* ── Shared by this deck's slides ─────────────────────────────────────────── */
+.kicker {
+  font-family: 'Geist Mono', monospace; font-size: 0.85rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.16em; color: var(--sapphire);
+}
+.lede { font-size: 1.15rem; color: var(--ink-dim); line-height: 1.45; max-width: 46rem; }
+.cols { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(0,1fr); gap: 1.8rem; margin-top: 0.8rem; }
+.cols.even { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+.stack { display: flex; flex-direction: column; gap: 0.8rem; }
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 0.8rem 1rem; display: flex; flex-direction: column; gap: 0.3rem;
+}
+.card b { font-size: 1rem; }
+.card span, .card p { font-size: 0.86rem; color: var(--ink-dim); line-height: 1.4; margin: 0; }
+.card.hl { border-color: var(--sapphire); box-shadow: 0 8px 24px -16px var(--sapphire); }
+.card.warn { border-color: #F5D37A; }
+.card.mongo { border-color: #00684A; }
+.n {
+  margin: 0.8rem 0 0.3rem; font-family: 'Geist Mono', monospace; font-size: 0.7rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.12em; color: var(--sapphire);
+}
+.n:first-child { margin-top: 0.2rem; }
+.n code { font-size: 1em; text-transform: none; }
+.hint { font-size: 0.8rem; color: var(--ink-dim); margin-top: 0.35rem; line-height: 1.4; }
+.flow { display: flex; align-items: stretch; gap: 0.6rem; }
+.flow .node {
+  flex: 1; display: flex; flex-direction: column; gap: 0.35rem;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 0.9rem 1rem;
+}
+.flow .node.hl { border-color: var(--sapphire); box-shadow: 0 8px 24px -16px var(--sapphire); }
+.flow .node.mongo { border-color: #00684A; }
+.flow .node b { font-size: 1rem; }
+.flow .node span { font-size: 0.8rem; color: var(--ink-dim); line-height: 1.35; }
+.flow .ico { font-size: 1.4rem; color: var(--sapphire); }
+.flow .node.mongo .ico { color: #00684A; }
+.flow .arrow { align-self: center; color: var(--ink-dim); font-size: 1.3rem; }
+.step-time {
+  position: absolute; top: 2.1rem; right: 3.5rem;
+  font-family: 'Geist Mono', monospace; font-size: 0.72rem; color: var(--ink-dim);
+}
+.ask-label { font-size: 0.85rem; margin: 0.5rem 0 0.25rem; }
+.ask-label b { color: var(--ink); }

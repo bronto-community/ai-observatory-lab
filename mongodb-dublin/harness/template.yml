@@ -1,0 +1,101 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  MongoDB Dublin lab: runs Storefront on MongoDB Atlas on one instance, replays
+  the checkout incident every hour, and sends Storefront's telemetry to the
+  shared Bronto demo org. Only 443 is open, for the Atlas log export relay; the
+  Elastic IP is also a fixed address for the Atlas access list. Manage it with SSM Session Manager.
+
+Parameters:
+  BrontoIngestionKey: { Type: String, NoEcho: true, Description: Ingestion key of the shared demo org }
+  BrontoRegion: { Type: String, Default: eu, AllowedValues: [eu, us] }
+  MongoUri: { Type: String, NoEcho: true, Description: "mongodb+srv:// URI of the M10 cluster, readWrite on storefront" }
+  RelayToken: { Type: String, NoEcho: true, Description: Shared secret Atlas's log export sends as X-Relay-Token }
+  InstanceType: { Type: String, Default: t4g.medium }
+  AmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-arm64
+
+Resources:
+  HarnessBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration:
+        { BlockPublicAcls: true, BlockPublicPolicy: true, IgnorePublicAcls: true, RestrictPublicBuckets: true }
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault: { SSEAlgorithm: AES256 }
+
+  Secrets:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: MongoDB Dublin harness .env
+      SecretString: !Sub |
+        BRONTO_REGION=${BrontoRegion}
+        BRONTO_INGEST_KEY=${BrontoIngestionKey}
+        MONGODB_URI=${MongoUri}
+        MONGODB_DB=storefront
+        RELAY_TOKEN=${RelayToken}
+
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - { Effect: Allow, Principal: { Service: ec2.amazonaws.com }, Action: sts:AssumeRole }
+      ManagedPolicyArns: [arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore]
+      Policies:
+        - PolicyName: read-harness
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - { Effect: Allow, Action: s3:GetObject, Resource: !Sub "${HarnessBucket.Arn}/*" }
+              - { Effect: Allow, Action: secretsmanager:GetSecretValue, Resource: !Ref Secrets }
+
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties: { Roles: [!Ref InstanceRole] }
+
+  EgressOnly:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      # HTTPS only, for Atlas's log export relay (Caddy checks the relay token).
+      GroupDescription: MongoDB Dublin harness, outbound only
+      SecurityGroupIngress:
+        - { IpProtocol: tcp, FromPort: 443, ToPort: 443, CidrIp: 0.0.0.0/0, Description: Atlas log export relay }
+
+  Address:
+    Type: AWS::EC2::EIP
+
+  Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref AmiId
+      InstanceType: !Ref InstanceType
+      IamInstanceProfile: !Ref InstanceProfile
+      SecurityGroupIds: [!GetAtt EgressOnly.GroupId]
+      MetadataOptions: { HttpTokens: required }
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs: { VolumeSize: 30, VolumeType: gp3, Encrypted: true }
+      Tags: [{ Key: Name, Value: mongodb-dublin-harness }]
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          for i in $(seq 1 60); do
+            aws s3 cp "s3://${HarnessBucket}/bootstrap.sh" /root/bootstrap.sh && break
+            sleep 10
+          done
+          BUCKET="${HarnessBucket}" SECRET="${Secrets}" bash /root/bootstrap.sh
+
+  AddressAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties: { AllocationId: !GetAtt Address.AllocationId, InstanceId: !Ref Instance }
+
+Outputs:
+  HarnessBucket: { Value: !Ref HarnessBucket }
+  InstanceId: { Value: !Ref Instance }
+  PublicIp:
+    Description: Add to Atlas → Network Access, so the services can reach the cluster
+    Value: !Ref Address

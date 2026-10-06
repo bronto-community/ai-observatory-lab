@@ -1,0 +1,54 @@
+# Two jobs:
+#  1. Storefront's traces, metrics and logs (OTLP gRPC from the services) to the
+#     shared Bronto demo org.
+#  2. The relay for Atlas's mongod log export. Atlas posts OTLP/HTTP to Caddy
+#     (TLS + relay token), Caddy hands it to otlp/atlas here. Each mongod JSON
+#     line becomes its own Bronto event with its fields as attributes
+#     (attr.ns, attr.planSummary, attr.docsExamined, ...), sent to /v1/logs as
+#     protobuf. Atlas's metrics don't pass through here: they go to Bronto directly.
+receivers:
+  otlp:
+    protocols:
+      grpc: { endpoint: 0.0.0.0:4317 }
+  otlp/atlas:
+    protocols:
+      http: { endpoint: 0.0.0.0:4318 }
+
+processors:
+  batch: {}
+  transform/atlas:
+    error_mode: ignore
+    log_statements:
+      - context: log
+        conditions: ['IsString(log.body) and IsMatch(log.body, "^\\s*\\{")']
+        statements:
+          - merge_maps(log.attributes, ParseJSON(log.body), "upsert")
+          - flatten(log.attributes, "", 4)
+  # Each Atlas node writes about 1 GB of routine log a day. Keep what an
+  # investigation needs: slow queries, warnings and errors (and anything that
+  # isn't a mongod JSON line, such as Atlas's test log).
+  filter/atlas:
+    error_mode: ignore
+    logs:
+      log_record:
+        - 'log.attributes["msg"] != nil and log.attributes["msg"] != "Slow query" and log.attributes["s"] == "I"'
+  resource/atlas:
+    attributes:
+      - { key: service.name, value: atlas-mongod, action: upsert }
+      - { key: service.namespace, value: mongodb-dublin, action: upsert }
+
+exporters:
+  otlphttp/bronto:
+    endpoint: https://ingestion.${env:BRONTO_REGION}.bronto.io
+    headers:
+      x-bronto-api-key: ${env:BRONTO_INGEST_KEY}
+
+service:
+  pipelines:
+    traces: { receivers: [otlp], processors: [batch], exporters: [otlphttp/bronto] }
+    metrics: { receivers: [otlp], processors: [batch], exporters: [otlphttp/bronto] }
+    logs: { receivers: [otlp], processors: [batch], exporters: [otlphttp/bronto] }
+    logs/atlas:
+      receivers: [otlp/atlas]
+      processors: [transform/atlas, filter/atlas, resource/atlas, batch]
+      exporters: [otlphttp/bronto]

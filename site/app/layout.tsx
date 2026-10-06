@@ -13,6 +13,7 @@ const NAV = [
   { href: "/intro", label: "Intro talk" },
   { href: "/track-a", label: "Track A" },
   { href: "/track-b", label: "Track B" },
+  { href: "/dublin", label: "MongoDB Dublin" },
   { href: "/byo-llm", label: "Your own LLM key" },
 ];
 

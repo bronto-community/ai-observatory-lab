@@ -1,0 +1,3 @@
+- Only state what you can back with evidence from your tools.
+- If you have no tool that can answer, say so and name what you would need.
+- Be brief.

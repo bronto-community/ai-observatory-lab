@@ -7,10 +7,8 @@ OTEL_EXPORTER_OTLP_ENDPOINT says, with the API key in OTEL_EXPORTER_OTLP_HEADERS
 importing Strands.
 """
 
-import json
 import logging
 import os
-from collections.abc import Mapping
 
 BRONTO_REGION = os.environ.get("BRONTO_REGION", "eu").strip().lower() or "eu"
 if BRONTO_REGION not in ("eu", "us"):
@@ -25,52 +23,12 @@ from opentelemetry._logs import set_logger_provider
 from opentelemetry.exporter.otlp.proto.http._log_exporter import OTLPLogExporter
 from opentelemetry.exporter.otlp.proto.http.metric_exporter import OTLPMetricExporter
 from opentelemetry.instrumentation.botocore import BotocoreInstrumentor
-from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler, LogRecordProcessor
+from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
-
-class GenAIEventFlattener(LogRecordProcessor):
-    """Make Botocore's GenAI events readable in Bronto.
-
-    Those events put their text in a map-valued log body and their type in the
-    OTLP event_name field. Bronto keeps neither today, so they arrive as empty
-    rows. Copy both into attributes before export: `event.name`, plus one
-    `body.<path>` attribute per leaf (Bronto flattens arrays the same way, as
-    .0, .1, ...). The body becomes the JSON text so @raw is readable too.
-    """
-
-    def on_emit(self, record) -> None:
-        lr = record.log_record
-        name = getattr(lr, "event_name", None)
-        if name:
-            lr.attributes["event.name"] = name
-        if isinstance(lr.body, Mapping):
-            for key, value in _flatten(lr.body, "body"):
-                lr.attributes[key] = value
-            lr.body = json.dumps(lr.body, default=str)
-
-    def shutdown(self) -> None:
-        pass
-
-    def force_flush(self, timeout_millis: int = 30000) -> bool:
-        return True
-
-
-def _flatten(value, prefix):
-    if isinstance(value, Mapping):
-        for k, v in value.items():
-            yield from _flatten(v, f"{prefix}.{k}")
-    elif isinstance(value, (list, tuple)):
-        for i, v in enumerate(value):
-            yield from _flatten(v, f"{prefix}.{i}")
-    elif isinstance(value, (str, bool, int, float)):
-        yield prefix, value
-    elif value is not None:
-        yield prefix, str(value)
-
 
 ATTENDEE = os.environ.get("ATTENDEE", "anonymous").strip().lower().replace(" ", "-") or "anonymous"
 
@@ -98,7 +56,6 @@ def setup_telemetry() -> None:
     # per question. Attaching to the root logger would also ship every
     # library's INFO chatter (botocore credentials, AgentCore, Strands).
     logger_provider = LoggerProvider(resource=resource)
-    logger_provider.add_log_record_processor(GenAIEventFlattener())  # must run before export
     logger_provider.add_log_record_processor(BatchLogRecordProcessor(OTLPLogExporter()))
     set_logger_provider(logger_provider)
     app_log = logging.getLogger("storefront-assistant")
